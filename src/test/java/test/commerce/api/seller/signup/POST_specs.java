@@ -12,6 +12,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static test.commerce.EmailGenerator.generateEmail;
 
 @SpringBootTest(
     classes = CommerceApiApp.class,
@@ -26,7 +27,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             "seller",
             "password"
         );
@@ -100,7 +101,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             null,
             "password"
         );
@@ -131,7 +132,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             username,
             "password"
         );
@@ -161,7 +162,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             username,
             "password"
         );
@@ -183,7 +184,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             "seller",
             null
         );
@@ -211,7 +212,7 @@ public class POST_specs {
     ) {
         // Arrange
         var command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             "seller",
             password
         );
@@ -232,7 +233,7 @@ public class POST_specs {
         @Autowired TestRestTemplate client
     ) {
         // Arrange
-        String email = "seller@test.com";
+        String email = generateEmail();
 
         client.postForEntity(
             "/seller/signUp",
