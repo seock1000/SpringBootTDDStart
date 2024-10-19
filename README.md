@@ -253,3 +253,49 @@
 - [x] 서로 다른 구매자의 식별자는 서로 다르다
 - [x] 같은 구매자의 식별자는 항상 같다
 - [x] 구매자의 기본 정보가 올바르게 설정된다
+
+### 판매자 상품 등록
+
+요청
+- 메서드: POST
+- 경로: /seller/products
+- 헤더
+  ```
+  Authorization: Bearer {accessToken}
+  ```
+- 본문
+  ```
+  RegisterProductCommand {
+    name: string,
+    imageUri: string,
+    description: string,
+    priceAmount: number,
+    stockQuantity: number
+  }
+  ```
+- curl 명령 예시
+  ```bash
+  curl -i -X POST 'http://localhost:8080/seller/products' \
+  -H 'Authorization: Bearer {accessToken}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Product 1",
+    "imageUri": "http://example.com/product1.jpg",
+    "description": "Product 1 description",
+    "priceAmount": 1000,
+    "stockQuantity": 10
+  }'
+  ```
+
+성공 응답
+- 상태코드: 201 Created
+- 헤더
+  ```
+  Location: /seller/products/{id}
+  ```
+
+테스트
+- [ ] 올바르게 요청하면 201 Created 상태코드를 반환한다
+- [ ] 판매자가 아닌 사용자의 접근 토큰을 사용하면 403 Forbidden 상태코드를 반환한다
+- [ ] imageUri 속성이 URI 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다
+- [ ] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다
