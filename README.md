@@ -30,7 +30,8 @@
   CreateSellerCommand {
     email: string,
     username: string,
-    password: string
+    password: string,
+    contactEmail: string
   }
   ```
 - curl 명령 예시
@@ -40,7 +41,8 @@
   -d '{
     "email": "seller1@example.com",
     "username": "seller1",
-    "password": "seller1-password"
+    "password": "seller1-password",
+    "contactEmail": "contact1@example.com"
   }'
   ```
 
@@ -212,7 +214,8 @@
   SellerMeView {
     id: string(UUID),
     email: string,
-    username: string
+    username: string,
+    contactEmail: string
   }
   ```
 
@@ -415,7 +418,8 @@
         id: string(UUID),
         seller: SellerView {
           id: string(UUID),
-          username: string
+          username: string,
+          contactEmail: string
         },
         name: string,
         imageUri: string,
