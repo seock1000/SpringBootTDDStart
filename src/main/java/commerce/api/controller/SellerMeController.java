@@ -20,7 +20,7 @@ public record SellerMeController(SellerRepository repository) {
             id,
             seller.getEmail(),
             seller.getUsername(),
-            null
+            seller.getContactEmail()
         );
     }
 }

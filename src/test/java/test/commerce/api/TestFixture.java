@@ -98,16 +98,22 @@ public record TestFixture(
     public void createSellerThenSetAsDefaultUser() {
         String email = generateEmail();
         String password = generatePassword();
-        createSeller(email, generateUsername(), password);
+        String contactEmail = generateEmail();
+        createSeller(email, generateUsername(), password, contactEmail);
         setSellerAsDefaultUser(email, password);
     }
 
-    private void createSeller(String email, String username, String password) {
+    public void createSeller(
+        String email,
+        String username,
+        String password,
+        String contactEmail
+    ) {
         var command = new CreateSellerCommand(
             email,
             username,
             password,
-            generateEmail()
+            contactEmail
         );
         ensureSuccessful(
             client.postForEntity("/seller/signUp", command, Void.class),

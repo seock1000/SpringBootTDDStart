@@ -34,6 +34,7 @@ public record SellerSignUpController(
         seller.setEmail(command.email());
         seller.setUsername(command.username());
         seller.setHashedPassword(hashedPassword);
+        seller.setContactEmail(command.contactEmail());
         repository.save(seller);
 
         return ResponseEntity.noContent().build();
@@ -42,6 +43,7 @@ public record SellerSignUpController(
     private static boolean isCommandValid(CreateSellerCommand command) {
         return isEmailValid(command.email())
             && isUsernameValid(command.username())
-            && isPasswordValid(command.password());
+            && isPasswordValid(command.password())
+            && isEmailValid(command.contactEmail());
     }
 }

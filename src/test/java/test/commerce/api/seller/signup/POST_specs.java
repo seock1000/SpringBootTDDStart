@@ -330,4 +330,29 @@ public class POST_specs {
         assertThat(actual).isNotNull();
         assertThat(encoder.matches(command.password(), actual)).isTrue();
     }
+
+    @ParameterizedTest
+    @MethodSource("test.commerce.TestDataSource#invalidEmails")
+    void contactEmail_속성이_올바르게_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
+        String contactEmail,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            generateEmail(),
+            generateUsername(),
+            generatePassword(),
+            contactEmail
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }

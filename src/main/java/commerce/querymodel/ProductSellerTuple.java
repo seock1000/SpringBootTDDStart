@@ -10,7 +10,11 @@ record ProductSellerTuple(Product product, Seller seller) {
     ProductView toView() {
         return new ProductView(
             product().getId(),
-            new SellerView(seller().getId(), seller().getUsername(), null),
+            new SellerView(
+                seller().getId(),
+                seller().getUsername(),
+                seller().getContactEmail()
+            ),
             product().getName(),
             product().getImageUri(),
             product().getDescription(),

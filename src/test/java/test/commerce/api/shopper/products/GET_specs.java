@@ -256,4 +256,30 @@ public class GET_specs {
             .extracting(ProductView::id)
             .containsAll(ids);
     }
+
+    @Test
+    void 문의_이메일_주소를_올바르게_설정한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        SellerMeView seller = fixture.getSeller();
+        fixture.registerProduct();
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        ProductView actual = requireNonNull(response.getBody()).items()[0];
+        assertThat(actual.seller().contactEmail())
+            .isEqualTo(seller.contactEmail());
+    }
 }

@@ -30,4 +30,6 @@ public class Seller {
 
     @Column(length = 1000)
     private String hashedPassword;
+
+    private String contactEmail;
 }
