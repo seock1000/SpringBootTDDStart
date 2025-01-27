@@ -1,6 +1,5 @@
 package test.commerce.api.seller.signup;
 
-import commerce.CommerceApiApp;
 import commerce.Seller;
 import commerce.SellerRepository;
 import commerce.command.CreateSellerCommand;
@@ -9,20 +8,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import test.commerce.api.CommerceApiTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.PasswordGenerator.generatePassword;
 import static test.commerce.UsernameGenerator.generateUsername;
 
-@SpringBootTest(
-    classes = CommerceApiApp.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
+@CommerceApiTest
 @DisplayName("POST /seller/signUp")
 public class POST_specs {
 
