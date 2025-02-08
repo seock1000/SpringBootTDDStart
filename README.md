@@ -33,6 +33,16 @@
     password: string
   }
   ```
+- curl 명령 예시
+  ```bash
+  curl -i -X POST 'http://localhost:8080/seller/signUp' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "seller1@example.com",
+    "username": "seller1",
+    "password": "seller1-password"
+  }'
+  ```
 
 성공 응답
 - 상태코드: 204 No Content
