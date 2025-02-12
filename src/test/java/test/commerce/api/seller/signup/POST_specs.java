@@ -39,4 +39,26 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(204);
     }
+
+    @Test
+    void email_속성이_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateSellerCommand(
+            null,
+            "seller",
+            "password"
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
