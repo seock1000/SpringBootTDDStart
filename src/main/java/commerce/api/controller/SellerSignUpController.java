@@ -23,6 +23,7 @@ public record SellerSignUpController(SellerRepository repository) {
 
         var seller = new Seller();
         seller.setEmail(command.email());
+        seller.setUsername(command.username());
 
         try {
             repository.save(seller);
