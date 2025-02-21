@@ -8,6 +8,7 @@ import java.util.UUID;
 import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.result.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +75,20 @@ public record SellerProductsController(ProductRepository repository) {
     }
 
     @GetMapping("/seller/products")
-    void getProducts() {
+    ResponseEntity<?> getProducts() {
+        SellerProductView[] items = repository
+            .findAll()
+            .stream()
+            .map(product -> new SellerProductView(
+                product.getId(),
+                null,
+                null,
+                null,
+                null,
+                0,
+                null
+            ))
+            .toArray(SellerProductView[]::new);
+        return ResponseEntity.ok(new ArrayCarrier<>(items));
     }
 }
