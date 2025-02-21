@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
 
@@ -59,5 +60,29 @@ public class GET_specs {
         assertThat(actual.items())
             .extracting(SellerProductView::id)
             .containsAll(ids);
+    }
+
+    @Test
+    void 다른_판매자가_등록한_상품이_포함되지_않는다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID unexpected = fixture.registerProduct();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts();
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response =
+            fixture.client().exchange(
+                get("/seller/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(SellerProductView::id)
+            .doesNotContain(unexpected);
     }
 }
