@@ -3,7 +3,6 @@ package commerce.api.controller;
 import commerce.Seller;
 import commerce.SellerRepository;
 import commerce.command.CreateSellerCommand;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,12 +30,7 @@ public record SellerSignUpController(
         seller.setEmail(command.email());
         seller.setUsername(command.username());
         seller.setHashedPassword(hashedPassword);
-
-        try {
-            repository.save(seller);
-        } catch (DataIntegrityViolationException exception) {
-            return ResponseEntity.badRequest().build();
-        }
+        repository.save(seller);
 
         return ResponseEntity.noContent().build();
     }

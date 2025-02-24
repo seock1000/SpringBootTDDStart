@@ -1,5 +1,7 @@
 package test.commerce.api.shopper.signup;
 
+import commerce.Shopper;
+import commerce.ShopperRepository;
 import commerce.command.CreateShopperCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import test.commerce.api.CommerceApiTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -221,5 +224,97 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void email_속성에_이미_존재하는_이메일_주소가_지정되면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+
+        client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(
+                email,
+                generateUsername(),
+                generatePassword()
+            ),
+            Void.class
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(
+                email,
+                generateUsername(),
+                generatePassword()
+            ),
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void username_속성이_이미_존재하는_사용자이름이_지정되면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String username = generateUsername();
+
+        client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(
+                generateEmail(),
+                username,
+                generatePassword()
+            ),
+            Void.class
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signUp",
+            new CreateShopperCommand(
+                generateEmail(),
+                username,
+                generatePassword()
+            ),
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 비밀번호를_올바르게_암호화한다(
+        @Autowired TestRestTemplate client,
+        @Autowired ShopperRepository repository,
+        @Autowired PasswordEncoder encoder
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+            generateEmail(),
+            generateUsername(),
+            generatePassword()
+        );
+
+        // Act
+        client.postForEntity("/shopper/signUp", command, Void.class);
+
+        // Assert
+        Shopper shopper = repository
+            .findAll()
+            .stream()
+            .filter(x -> x.getEmail().equals(command.email()))
+            .findFirst()
+            .orElseThrow();
+        String actual = shopper.getHashedPassword();
+        assertThat(actual).isNotNull();
+        assertThat(encoder.matches(command.password(), actual)).isTrue();
     }
 }
