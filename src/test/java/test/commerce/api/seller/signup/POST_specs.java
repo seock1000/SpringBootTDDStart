@@ -6,6 +6,7 @@ import commerce.command.CreateSellerCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -202,11 +203,7 @@ public class POST_specs {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "",
-        "pass",
-        "pass123"
-    })
+    @MethodSource("test.commerce.TestDataSource#invalidPasswords")
     void password_속성이_올바른_형식을_따르지_않으면_400_Bad_Request_상태코드를_반환한다(
         String password,
         @Autowired TestRestTemplate client

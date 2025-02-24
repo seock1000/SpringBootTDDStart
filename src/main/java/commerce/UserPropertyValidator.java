@@ -12,4 +12,8 @@ public class UserPropertyValidator {
     public static boolean isUsernameValid(String username) {
         return username != null && username.matches(USERNAME_REGEX);
     }
+
+    public static boolean isPasswordValid(String password) {
+        return password != null && password.length() >= 8;
+    }
 }

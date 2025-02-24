@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static commerce.UserPropertyValidator.isEmailValid;
+import static commerce.UserPropertyValidator.isPasswordValid;
 import static commerce.UserPropertyValidator.isUsernameValid;
 
 @RestController
@@ -44,9 +45,5 @@ public record SellerSignUpController(
         return isEmailValid(command.email())
             && isUsernameValid(command.username())
             && isPasswordValid(command.password());
-    }
-
-    private static boolean isPasswordValid(String password) {
-        return password != null && password.length() >= 8;
     }
 }
