@@ -92,4 +92,87 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void username_속성이_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+            generateEmail(),
+            null,
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "sh",
+        "shopper ",
+        "shopper.",
+        "shopper!",
+        "shopper@"
+    })
+    void username_속성이_올바른_형식을_따르지_않으면_400_Bad_Request_상태코드를_반환한다(
+        String username,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+            generateEmail(),
+            username,
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "abcdefghijklmnopqrstuvwxyz",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "0123456789",
+        "shopper_",
+        "shopper-"
+    })
+    void username_속성이_올바른_형식을_따르면_204_No_Content_상태코드를_반환한다(
+        String username,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+            generateEmail(),
+            username,
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signUp",
+            command,
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
 }

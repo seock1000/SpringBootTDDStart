@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static commerce.UserPropertyValidator.isEmailValid;
+import static commerce.UserPropertyValidator.isUsernameValid;
 
 @RestController
 public record ShopperSignUpController() {
@@ -21,6 +22,7 @@ public record ShopperSignUpController() {
     }
 
     private static boolean isCommandValid(CreateShopperCommand command) {
-        return isEmailValid(command.email());
+        return isEmailValid(command.email())
+            && isUsernameValid(command.username());
     }
 }
