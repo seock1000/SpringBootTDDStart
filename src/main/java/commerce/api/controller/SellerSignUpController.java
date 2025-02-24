@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static commerce.UserPropertyValidator.isEmailValid;
+
 @RestController
 public record SellerSignUpController(
     PasswordEncoder passwordEncoder,
     SellerRepository repository
 ) {
 
-    public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
     public static final String USERNAME_REGEX = "^[a-zA-Z0-9_-]{3,}$";
 
     @PostMapping("/seller/signUp")
@@ -44,10 +45,6 @@ public record SellerSignUpController(
         return isEmailValid(command.email())
             && isUsernameValid(command.username())
             && isPasswordValid(command.password());
-    }
-
-    private static boolean isEmailValid(String email) {
-        return email != null && email.matches(EMAIL_REGEX);
     }
 
     private static boolean isUsernameValid(String username) {
