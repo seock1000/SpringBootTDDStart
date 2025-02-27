@@ -1,12 +1,10 @@
 package commerce.api.controller;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import commerce.SellerRepository;
+import commerce.api.JwtKeyHolder;
 import commerce.query.IssueSellerToken;
 import commerce.result.AccessTokenCarrier;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public record SellerIssueTokenController(
     SellerRepository repository,
     PasswordEncoder passwordEncoder,
-    @Value("${security.jwt.secret}") String jwtSecret
+    JwtKeyHolder jwtKeyHolder
 ) {
 
     @PostMapping("/seller/issueToken")
@@ -37,7 +35,7 @@ public record SellerIssueTokenController(
     private String composeToken() {
         return Jwts
             .builder()
-            .signWith(new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256"))
+            .signWith(jwtKeyHolder.key())
             .compact();
     }
 }
