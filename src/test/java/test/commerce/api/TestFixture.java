@@ -4,6 +4,7 @@ import commerce.command.CreateShopperCommand;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.PasswordGenerator.generatePassword;
@@ -30,5 +31,17 @@ public record TestFixture(TestRestTemplate client) {
         String password = generatePassword();
         createShopper(email, generateUsername(), password);
         return issueShopperToken(email, password);
+    }
+
+    public void setShopperAsDefaultUser(String email, String password) {
+        String token = issueShopperToken(email, password);
+        RestTemplate template = client.getRestTemplate();
+        template.getInterceptors().add((request, body, execution) -> {
+            if (request.getHeaders().containsKey("Authorization") == false) {
+                request.getHeaders().add("Authorization", "Bearer " + token);
+            }
+
+            return execution.execute(request, body);
+        });
     }
 }
