@@ -43,10 +43,9 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/seller/signUp").permitAll()
                 .requestMatchers("/seller/issueToken").permitAll()
-                .requestMatchers("/seller/me").authenticated()
                 .requestMatchers("/shopper/signUp").permitAll()
                 .requestMatchers("/shopper/issueToken").permitAll()
-                .requestMatchers("/shopper/me").permitAll()
+                .anyRequest().authenticated()
             )
             .build();
     }
