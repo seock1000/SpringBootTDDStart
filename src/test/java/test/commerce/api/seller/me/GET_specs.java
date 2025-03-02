@@ -51,4 +51,18 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
+
+    @Test
+    void 접근_토큰을_사용하지_않으면_401_Unauthorized_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Act
+        ResponseEntity<SellerMeView> response = client.getForEntity(
+            "/seller/me",
+            SellerMeView.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
+    }
 }
