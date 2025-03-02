@@ -1,8 +1,5 @@
 package test.commerce.api.shopper.me;
 
-import commerce.command.CreateShopperCommand;
-import commerce.query.IssueShopperToken;
-import commerce.result.AccessTokenCarrier;
 import commerce.view.ShopperMeView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,18 +24,10 @@ public class GET_specs {
     ) {
         // Arrange
         String email = generateEmail();
-        String username = generateUsername();
         String password = generatePassword();
 
-        var command = new CreateShopperCommand(email, username, password);
-        fixture.client().postForEntity("/shopper/signUp", command, Void.class);
-
-        AccessTokenCarrier carrier = fixture.client().postForObject(
-            "/shopper/issueToken",
-            new IssueShopperToken(email, password),
-            AccessTokenCarrier.class
-        );
-        String token = carrier.accessToken();
+        fixture.createShopper(email, generateUsername(), password);
+        String token = fixture.issueShopperToken(email, password);
 
         // Act
         ResponseEntity<ShopperMeView> response = fixture.client().exchange(
