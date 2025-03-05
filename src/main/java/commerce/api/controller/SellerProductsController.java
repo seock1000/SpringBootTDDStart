@@ -26,7 +26,8 @@ public record SellerProductsController(SellerRepository repository) {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.status(201).build();
+        URI location = URI.create("/seller/products/" + UUID.randomUUID());
+        return ResponseEntity.created(location).build();
     }
 
     private boolean isValidUri(String value) {

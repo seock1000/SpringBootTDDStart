@@ -1,5 +1,9 @@
 package test.commerce.api.seller.products;
 
+import java.net.URI;
+import java.util.UUID;
+import java.util.function.Predicate;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -75,5 +79,41 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 올바르게_요청하면_등록된_상품_정보에_접근하는_Location_헤더를_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<Void> response = fixture.client().postForEntity(
+            "/seller/products",
+            generateRegisterProductCommand(),
+            Void.class
+        );
+
+        // Assert
+        URI actual = response.getHeaders().getLocation();
+        assertThat(actual).isNotNull();
+        assertThat(actual.isAbsolute()).isFalse();
+        assertThat(actual.getPath())
+            .startsWith("/seller/products/")
+            .matches(endsWithUUID());
+    }
+
+    private Predicate<? super String> endsWithUUID() {
+        return path -> {
+            String[] segments = path.split("/");
+            String lastSegment = segments[segments.length - 1];
+            try {
+                UUID.fromString(lastSegment);
+                return true;
+            } catch (IllegalArgumentException exception) {
+                return false;
+            }
+        };
     }
 }
