@@ -53,4 +53,22 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(403);
     }
+
+    @Test
+    void 존재하지_않는_상품_식별자를_사용하면_404_Not_Found_상태코드를_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID id = UUID.randomUUID();
+
+        // Act
+        ResponseEntity<?> response = fixture.client().getForEntity(
+            "/seller/products/" + id,
+            SellerProductView.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(404);
+    }
 }
