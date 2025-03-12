@@ -7,6 +7,7 @@ import java.util.UUID;
 import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,5 +38,9 @@ public record SellerProductsController(SellerRepository repository) {
         } catch (IllegalArgumentException exception) {
             return false;
         }
+    }
+
+    @GetMapping("/seller/products/{id}")
+    void findProduct() {
     }
 }
