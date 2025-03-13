@@ -41,7 +41,7 @@ public record TestFixture(TestRestTemplate client) {
 
     private void setDefaultAuthorization(String authorization) {
         RestTemplate template = client.getRestTemplate();
-        template.getInterceptors().add((request, body, execution) -> {
+        template.getInterceptors().addFirst((request, body, execution) -> {
             if (request.getHeaders().containsKey("Authorization") == false) {
                 request.getHeaders().add("Authorization", authorization);
             }
@@ -74,5 +74,12 @@ public record TestFixture(TestRestTemplate client) {
             AccessTokenCarrier.class
         );
         return carrier.accessToken();
+    }
+
+    public void createShopperThenSetAsDefaultUser() {
+        String email = generateEmail();
+        String password = generatePassword();
+        createShopper(email, generateUsername(), password);
+        setShopperAsDefaultUser(email, password);
     }
 }
