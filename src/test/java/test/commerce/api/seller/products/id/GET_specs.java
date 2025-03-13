@@ -1,5 +1,6 @@
 package test.commerce.api.seller.products.id;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import commerce.command.RegisterProductCommand;
@@ -11,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static test.commerce.ProductAssertions.isDerivedFrom;
 import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 
@@ -131,5 +135,25 @@ public class GET_specs {
 
         // Assert
         assertThat(actual).satisfies(isDerivedFrom(command));
+    }
+
+    @Test
+    void 상품_등록_시각을_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        LocalDateTime referenceTime = LocalDateTime.now(UTC);
+        UUID id = fixture.registerProduct();
+
+        // Act
+        SellerProductView actual = fixture.client().getForObject(
+            "/seller/products/" + id,
+            SellerProductView.class
+        );
+
+        // Assert
+        assertThat(actual.registeredTimeUtc())
+            .isCloseTo(referenceTime, within(1, SECONDS));
     }
 }

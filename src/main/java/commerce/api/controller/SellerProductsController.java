@@ -2,6 +2,7 @@ package commerce.api.controller;
 
 import java.net.URI;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import commerce.Product;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import static java.time.ZoneOffset.UTC;
 
 @RestController
 public record SellerProductsController(ProductRepository repository) {
@@ -36,6 +39,7 @@ public record SellerProductsController(ProductRepository repository) {
         product.setDescription(command.description());
         product.setPriceAmount(command.priceAmount());
         product.setStockQuantity(command.stockQuantity());
+        product.setRegisteredTimeUtc(LocalDateTime.now(UTC));
         repository.save(product);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
@@ -63,7 +67,7 @@ public record SellerProductsController(ProductRepository repository) {
                 product.getDescription(),
                 product.getPriceAmount(),
                 product.getStockQuantity(),
-                null
+                product.getRegisteredTimeUtc()
             ))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());

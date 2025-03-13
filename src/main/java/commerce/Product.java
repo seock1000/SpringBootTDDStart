@@ -1,6 +1,7 @@
 package commerce;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -34,4 +35,6 @@ public class Product {
     private BigDecimal priceAmount;
 
     private Integer stockQuantity;
+
+    private LocalDateTime registeredTimeUtc;
 }
