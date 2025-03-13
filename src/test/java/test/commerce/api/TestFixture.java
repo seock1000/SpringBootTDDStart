@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import commerce.command.CreateSellerCommand;
 import commerce.command.CreateShopperCommand;
+import commerce.command.RegisterProductCommand;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
@@ -100,9 +101,13 @@ public record TestFixture(TestRestTemplate client) {
     }
 
     public UUID registerProduct() {
+        return registerProduct(generateRegisterProductCommand());
+    }
+
+    public UUID registerProduct(RegisterProductCommand command) {
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/products",
-            generateRegisterProductCommand(),
+            command,
             Void.class
         );
         URI location = response.getHeaders().getLocation();

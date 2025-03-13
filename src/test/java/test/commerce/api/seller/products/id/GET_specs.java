@@ -2,6 +2,7 @@ package test.commerce.api.seller.products.id;
 
 import java.util.UUID;
 
+import commerce.command.RegisterProductCommand;
 import commerce.view.SellerProductView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static test.commerce.ProductAssertions.isDerivedFrom;
+import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 
 @CommerceApiTest
 @DisplayName("GET /seller/product/{id}")
@@ -109,5 +112,24 @@ public class GET_specs {
         // Assert
         assertThat(actual).isNotNull();
         assertThat(actual.id()).isEqualTo(id);
+    }
+
+    @Test
+    void 상품_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        RegisterProductCommand command = generateRegisterProductCommand();
+        UUID id = fixture.registerProduct(command);
+
+        // Act
+        SellerProductView actual = fixture.client().getForObject(
+            "/seller/products/" + id,
+            SellerProductView.class
+        );
+
+        // Assert
+        assertThat(actual).satisfies(isDerivedFrom(command));
     }
 }

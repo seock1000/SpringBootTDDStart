@@ -1,5 +1,6 @@
 package commerce;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -23,4 +24,14 @@ public class Product {
     private UUID id;
 
     private UUID sellerId;
+
+    private String name;
+
+    private String imageUri;
+
+    private String description;
+
+    private BigDecimal priceAmount;
+
+    private Integer stockQuantity;
 }

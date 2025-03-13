@@ -31,6 +31,11 @@ public record SellerProductsController(ProductRepository repository) {
         var product = new Product();
         product.setId(id);
         product.setSellerId(UUID.fromString(user.getName()));
+        product.setName(command.name());
+        product.setImageUri(command.imageUri());
+        product.setDescription(command.description());
+        product.setPriceAmount(command.priceAmount());
+        product.setStockQuantity(command.stockQuantity());
         repository.save(product);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
@@ -53,11 +58,11 @@ public record SellerProductsController(ProductRepository repository) {
             .filter(product -> product.getSellerId().equals(sellerId))
             .map(product -> new SellerProductView(
                 product.getId(),
-                null,
-                null,
-                null,
-                null,
-                0,
+                product.getName(),
+                product.getImageUri(),
+                product.getDescription(),
+                product.getPriceAmount(),
+                product.getStockQuantity(),
                 null
             ))
             .map(ResponseEntity::ok)
