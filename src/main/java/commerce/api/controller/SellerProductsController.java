@@ -82,11 +82,11 @@ public record SellerProductsController(ProductRepository repository) {
             .stream()
             .map(product -> new SellerProductView(
                 product.getId(),
-                null,
-                null,
-                null,
-                null,
-                0,
+                product.getName(),
+                product.getImageUri(),
+                product.getDescription(),
+                product.getPriceAmount(),
+                product.getStockQuantity(),
                 null
             ))
             .toArray(SellerProductView[]::new);
