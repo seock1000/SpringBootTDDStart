@@ -22,11 +22,11 @@ public record ShopperProductsController(ProductRepository repository) {
             .map(product -> new ProductView(
                 product.getId(),
                 null,
-                null,
-                null,
-                null,
-                null,
-                0
+                product.getName(),
+                product.getImageUri(),
+                product.getDescription(),
+                product.getPriceAmount(),
+                product.getStockQuantity()
             ))
             .toArray(ProductView[]::new);
         return new PageCarrier<>(items, null);

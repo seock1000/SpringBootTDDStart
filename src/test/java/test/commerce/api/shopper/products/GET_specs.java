@@ -3,6 +3,7 @@ package test.commerce.api.shopper.products;
 import java.util.List;
 import java.util.UUID;
 
+import commerce.command.RegisterProductCommand;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,8 @@ import test.commerce.api.TestFixture;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
+import static test.commerce.ProductAssertions.isViewDerivedFrom;
+import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 
 @CommerceApiTest
 @DisplayName("GET /shopper/products")
@@ -109,5 +112,30 @@ public class GET_specs {
         assertThat(requireNonNull(response.getBody()).items())
             .extracting(ProductView::id)
             .containsExactly(id3, id2, id1);
+    }
+
+    @Test
+    void 상품_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        RegisterProductCommand command = generateRegisterProductCommand();
+        fixture.registerProduct(command);
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        ProductView actual = requireNonNull(response.getBody()).items()[0];
+        assertThat(actual).satisfies(isViewDerivedFrom(command));
     }
 }
