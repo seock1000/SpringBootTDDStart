@@ -103,7 +103,12 @@ public record TestFixture(
     }
 
     private void createSeller(String email, String username, String password) {
-        var command = new CreateSellerCommand(email, username, password);
+        var command = new CreateSellerCommand(
+            email,
+            username,
+            password,
+            generateEmail()
+        );
         ensureSuccessful(
             client.postForEntity("/seller/signUp", command, Void.class),
             command

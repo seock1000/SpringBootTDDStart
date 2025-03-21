@@ -31,7 +31,12 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                password,
+                generateEmail()
+            ),
             Void.class
         );
 
@@ -56,7 +61,12 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                password,
+                generateEmail()
+            ),
             Void.class
         );
 
@@ -82,7 +92,12 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                password,
+                generateEmail()
+            ),
             Void.class
         );
 
@@ -128,7 +143,12 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signUp",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(
+                email,
+                generateUsername(),
+                password,
+                generateEmail()
+            ),
             Void.class
         );
 
