@@ -10,6 +10,8 @@ import commerce.view.SellerMeView;
 import commerce.view.SellerView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
@@ -195,5 +197,36 @@ public class GET_specs {
         assertThat(requireNonNull(response.getBody()).items())
             .extracting(ProductView::id)
             .containsExactlyElementsOf(ids.reversed());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 1, PAGE_SIZE })
+    void 마지막_페이지를_올바르게_반환한다(
+        int lastPageSize,
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        List<UUID> ids = fixture.registerProducts(lastPageSize);
+        fixture.registerProducts(PAGE_SIZE * 2);
+
+        fixture.createShopperThenSetAsDefaultUser();
+        String token = fixture.consumeTwoProductPages();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products?continuationToken=" + token).build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        PageCarrier<ProductView> actual = response.getBody();
+        assertThat(requireNonNull(actual).items())
+            .extracting(ProductView::id)
+            .containsExactlyElementsOf(ids.reversed());
+        assertThat(actual.continuationToken()).isNull();
     }
 }
