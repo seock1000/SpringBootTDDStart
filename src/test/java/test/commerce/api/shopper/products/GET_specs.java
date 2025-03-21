@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
 
@@ -81,5 +82,32 @@ public class GET_specs {
         PageCarrier<ProductView> actual = response.getBody();
         assertThat(actual).isNotNull();
         assertThat(actual.items()).extracting(ProductView::id).containsAll(ids);
+    }
+
+    @Test
+    void 상품_목록을_등록_시점_역순으로_정렬한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        UUID id1 = fixture.registerProduct();
+        UUID id2 = fixture.registerProduct();
+        UUID id3 = fixture.registerProduct();
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(ProductView::id)
+            .containsExactly(id3, id2, id1);
     }
 }
