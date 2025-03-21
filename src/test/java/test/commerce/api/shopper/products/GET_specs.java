@@ -168,4 +168,32 @@ public class GET_specs {
         assertThat(actual.id()).isEqualTo(seller.id());
         assertThat(actual.username()).isEqualTo(seller.username());
     }
+
+    @Test
+    void 두_번째_페이지를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts(PAGE_SIZE / 2);
+        List<UUID> ids = fixture.registerProducts(PAGE_SIZE);
+        fixture.registerProducts(PAGE_SIZE);
+
+        fixture.createShopperThenSetAsDefaultUser();
+        String token = fixture.consumeProductPage();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products?continuationToken=" + token).build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(ProductView::id)
+            .containsExactlyElementsOf(ids.reversed());
+    }
 }
