@@ -1,34 +1,30 @@
 package commerce.api.controller;
 
-import commerce.Product;
-import commerce.ProductRepository;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
+import jakarta.persistence.EntityManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
-
 @RestController
-public record ShopperProductsController(ProductRepository repository) {
+public record ShopperProductsController(EntityManager entityManager) {
 
     @GetMapping("/shopper/products")
     PageCarrier<ProductView> getProducts() {
-        ProductView[] items = repository
-            .findAll()
+        String queryString = """
+            SELECT new commerce.api.controller.ProductSellerTuple(p, s)
+            FROM Product p
+            JOIN Seller s ON p.sellerId = s.id
+            ORDER BY p.dataKey DESC
+            """;
+
+        ProductView[] items = entityManager
+            .createQuery(queryString, ProductSellerTuple.class)
+            .getResultList()
             .stream()
-            .sorted(comparing(Product::getDataKey, reverseOrder()))
-            .map(product -> new ProductView(
-                product.getId(),
-                null,
-                product.getName(),
-                product.getImageUri(),
-                product.getDescription(),
-                product.getPriceAmount(),
-                product.getStockQuantity()
-            ))
+            .map(ProductSellerTuple::toView)
             .toArray(ProductView[]::new);
+
         return new PageCarrier<>(items, null);
     }
 }

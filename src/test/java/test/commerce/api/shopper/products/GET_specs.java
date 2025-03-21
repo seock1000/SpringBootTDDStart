@@ -6,6 +6,8 @@ import java.util.UUID;
 import commerce.command.RegisterProductCommand;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
+import commerce.view.SellerMeView;
+import commerce.view.SellerView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,5 +139,33 @@ public class GET_specs {
         // Assert
         ProductView actual = requireNonNull(response.getBody()).items()[0];
         assertThat(actual).satisfies(isViewDerivedFrom(command));
+    }
+
+    @Test
+    void 판매자_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        SellerMeView seller = fixture.getSeller();
+        fixture.registerProduct();
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        PageCarrier<ProductView> body = response.getBody();
+        SellerView actual = requireNonNull(body).items()[0].seller();
+        assertThat(actual).isNotNull();
+        assertThat(actual.id()).isEqualTo(seller.id());
+        assertThat(actual.username()).isEqualTo(seller.username());
     }
 }
