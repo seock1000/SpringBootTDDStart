@@ -34,4 +34,22 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
+
+    @Test
+    void 판매자_접근_토큰을_사용하면_403_Forbidden_상태코드를_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
+    }
 }
