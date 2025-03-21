@@ -229,4 +229,31 @@ public class GET_specs {
             .containsExactlyElementsOf(ids.reversed());
         assertThat(actual.continuationToken()).isNull();
     }
+
+    @Test
+    void continuationToken_매개변수에_빈_문자열이_지정되면_첫_번째_페이지를_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts(PAGE_SIZE);
+        List<UUID> ids = fixture.registerProducts(PAGE_SIZE);
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products?continuationToken=").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(ProductView::id)
+            .containsAll(ids);
+    }
 }

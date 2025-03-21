@@ -49,7 +49,7 @@ public record ShopperProductsController(EntityManager entityManager) {
     }
 
     private static Long decodeCursor(String continuationToken) {
-        if (continuationToken == null) {
+        if (continuationToken == null || continuationToken.isBlank()) {
             return null;
         }
 
