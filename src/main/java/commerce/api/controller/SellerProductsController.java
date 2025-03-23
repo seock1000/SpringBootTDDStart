@@ -2,13 +2,12 @@ package commerce.api.controller;
 
 import java.net.URI;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
-import commerce.commandmodel.InvalidCommandException;
+import commerce.commandmodel.RegisterProductCommandExecutor;
 import commerce.result.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 
@@ -30,32 +28,11 @@ public record SellerProductsController(ProductRepository repository) {
         @RequestBody RegisterProductCommand command,
         Principal user
     ) {
-        if (isValidUri(command.imageUri()) == false) {
-            throw new InvalidCommandException();
-        }
-
         UUID id = UUID.randomUUID();
-        var product = new Product();
-        product.setId(id);
-        product.setSellerId(UUID.fromString(user.getName()));
-        product.setName(command.name());
-        product.setImageUri(command.imageUri());
-        product.setDescription(command.description());
-        product.setPriceAmount(command.priceAmount());
-        product.setStockQuantity(command.stockQuantity());
-        product.setRegisteredTimeUtc(LocalDateTime.now(UTC));
-        repository.save(product);
+        var executor = new RegisterProductCommandExecutor(repository::save);
+        executor.execute(id, UUID.fromString(user.getName()), command);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
-    }
-
-    private boolean isValidUri(String value) {
-        try {
-            URI uri = URI.create(value);
-            return uri.getHost() != null;
-        } catch (IllegalArgumentException exception) {
-            return false;
-        }
     }
 
     @GetMapping("/seller/products/{id}")
