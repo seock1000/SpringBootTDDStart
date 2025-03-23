@@ -8,6 +8,9 @@ import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
 import commerce.commandmodel.RegisterProductCommandExecutor;
+import commerce.query.FindSellerProduct;
+import commerce.querymodel.FindSellerProductQueryProcessor;
+import commerce.querymodel.ProductMapper;
 import commerce.result.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +40,9 @@ public record SellerProductsController(ProductRepository repository) {
 
     @GetMapping("/seller/products/{id}")
     ResponseEntity<?> findProduct(@PathVariable UUID id, Principal user) {
-        UUID sellerId = UUID.fromString(user.getName());
-        return repository
-            .findById(id)
-            .filter(product -> product.getSellerId().equals(sellerId))
-            .map(SellerProductsController::convertToView)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        var processor = new FindSellerProductQueryProcessor(repository::findById);
+        var query = new FindSellerProduct(UUID.fromString(user.getName()), id);
+        return ResponseEntity.of(processor.process(query));
     }
 
     @GetMapping("/seller/products")
@@ -53,20 +52,8 @@ public record SellerProductsController(ProductRepository repository) {
             .findBySellerId(sellerId)
             .stream()
             .sorted(comparing(Product::getRegisteredTimeUtc, reverseOrder()))
-            .map(SellerProductsController::convertToView)
+            .map(ProductMapper::convertToViewForSeller)
             .toArray(SellerProductView[]::new);
         return ResponseEntity.ok(new ArrayCarrier<>(items));
-    }
-
-    private static SellerProductView convertToView(Product product) {
-        return new SellerProductView(
-            product.getId(),
-            product.getName(),
-            product.getImageUri(),
-            product.getDescription(),
-            product.getPriceAmount(),
-            product.getStockQuantity(),
-            product.getRegisteredTimeUtc()
-        );
     }
 }
