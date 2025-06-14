@@ -63,7 +63,7 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] username 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
 - [x] username 속성이 올바른 형식을 따르면 204 NO_CONTENT 응답을 반환한다.
 - [x] password 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
-- [ ] password 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [x] password 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] 이미 존재하는 이메일 주소로 요청하면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] 이미 존재하는 사용자 이름으로 요청하면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] 비밀번호를 올바르게 암호화 한다.
