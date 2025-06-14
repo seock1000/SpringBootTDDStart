@@ -117,6 +117,11 @@ public class POST_specs {
     @ParameterizedTest
     @ValueSource(strings = {
         "",
+        "se",
+        "seller ",
+        "seller@",
+        "seller.",
+        "seller!",
     })
     void username_속성이_올바른_형식을_따르지_않으면_400_BAD_REQUEST_응답을_반환한다(
         String username,
