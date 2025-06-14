@@ -13,3 +13,57 @@
 ```bash
 ./gradlew bootRun
 ```
+
+
+## API 목록
+
+### 판매자 회원가입
+
+요청
+- 메서드: POST
+- 경로: /seller/signup
+- 헤더: 
+  ```
+    Content-Type: application/json
+  ```
+- 본문:
+  ```
+     CreateSellerCommand {
+        email: String,
+        username: String,
+        password: String
+     }
+  ```
+
+- curl 명령 예시:
+```bash
+curl -i -X POST 'http://localhost:8080/seller/signup' \
+-H 'Content-Type: application/json' \
+-d '{
+  "email": "seller1@example.com",
+  "username": "seller1",
+  "password": "seller1-password"
+  }'
+```
+
+성공 응답:
+- 상태 코드: 204 NO_CONTENT
+
+정책
+- 이메일 주소는 유일해야 한다.
+- 사용자 이름은 유일해야 한다.
+- 사용자 이름은 3자 이상의 영문자, 숫자, 하이픈, 밑줄문자로 구성되어야 한다.
+- 비밀번호는 8자 이상의 문자로 구성되어야 한다.
+
+테스트
+- [ ] 올바르게 요청하면 204 NO_CONTENT 응답을 반환한다.
+- [ ] email 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] email 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] username 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] username 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] password 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] password 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] 이미 존재하는 이메일 주소로 요청하면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] 이미 존재하는 사용자 이름으로 요청하면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] 비밀번호를 올바르게 암호화 한다.
+
