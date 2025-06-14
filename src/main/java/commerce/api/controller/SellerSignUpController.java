@@ -13,7 +13,14 @@ public record SellerSignUpController() {
     ResponseEntity<?> signUp(
         @RequestBody CreateSellerCommand command
     ) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         if(command.email() == null) {
+            return ResponseEntity.badRequest().build();
+        } else if(!command.email().contains("@")) {
+            return ResponseEntity.badRequest().build();
+        } else if(command.email().endsWith("@")) {
+            return ResponseEntity.badRequest().build();
+        } else if(!command.email().matches(emailRegex)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();

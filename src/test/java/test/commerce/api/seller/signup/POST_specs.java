@@ -4,6 +4,8 @@ import commerce.CommerceApiApp;
 import commerce.command.CreateSellerCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -47,6 +49,36 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             null, // email 속성 없음
+            "seller",
+            "password"
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "invalid-email",
+        "invalid-email@",
+        "invalid-email@test",
+        "invalid-email@test.",
+        "invalid-email@.com",
+    })
+    void email_속성이_올바른_형식을_따르지_않으면_400_BAD_REQUEST_응답을_반환한다(
+        String email,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(
+            email, // 잘못된 형식의 email
             "seller",
             "password"
         );
