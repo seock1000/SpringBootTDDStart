@@ -22,6 +22,8 @@ public record SellerSignUpController() {
             return ResponseEntity.badRequest().build();
         } else if(!command.email().matches(emailRegex)) {
             return ResponseEntity.badRequest().build();
+        } else if(command.username() == null) {
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();
     }
