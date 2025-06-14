@@ -142,4 +142,32 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "seller",
+        "FDIFOEIFIEJFSJF",
+        "01010142412",
+        "seller-",
+        "seller_",
+    })
+    void username_속성이_올바른_형식을_따르면_204_NO_CONTENT_응답을_반환한다(
+        String username,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(
+            "seller@test.com",
+            username, // 올바른 형식의 username
+            "password"
+        );
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
 }
