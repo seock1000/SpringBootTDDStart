@@ -93,4 +93,24 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void username_속성이_지정되지_않으면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(
+            "seller@test.com",
+            null, // username 속성 없음
+            "password"
+        );
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
