@@ -12,6 +12,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static test.commerce.EmailGenerator.generateEmail;
 
 @SpringBootTest(
     classes = CommerceApiApp.class,
@@ -26,7 +27,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
         "seller",
         "password"
         );
@@ -100,7 +101,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             null, // username 속성 없음
             "password"
         );
@@ -129,7 +130,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             username, // 잘못된 형식의 username
             "password"
         );
@@ -157,7 +158,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             username, // 올바른 형식의 username
             "password"
         );
@@ -177,7 +178,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             "seller",
             null // password 속성 없음
         );
@@ -203,7 +204,7 @@ public class POST_specs {
     ) {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
-            "seller@test.com",
+            generateEmail(),
             "seller",
             password // 잘못된 형식의 password
         );
@@ -222,7 +223,7 @@ public class POST_specs {
         @Autowired TestRestTemplate client
     ) {
         // Arrange
-        String email = "seller@test.com";
+        String email = generateEmail();
         CreateSellerCommand command = new CreateSellerCommand(
             email,
             "seller",
