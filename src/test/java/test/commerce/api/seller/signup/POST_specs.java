@@ -216,4 +216,28 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void 이미_존재하는_이메일_주소로_요청하면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = "seller@test.com";
+        CreateSellerCommand command = new CreateSellerCommand(
+            email,
+            "seller",
+            "password"
+        );
+        client.postForEntity("/seller/signup", command, Void.class);
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            new CreateSellerCommand(email, "seller", "password"), // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
