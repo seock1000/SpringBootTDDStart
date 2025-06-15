@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
+import static test.commerce.UsernameGenerator.generateUsername;
 
 @SpringBootTest(
     classes = CommerceApiApp.class,
@@ -28,7 +29,7 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
-        "seller",
+            generateUsername(),
         "password"
         );
 
@@ -50,7 +51,7 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             null, // email 속성 없음
-            "seller",
+            generateUsername(),
             "password"
         );
 
@@ -80,7 +81,7 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             email, // 잘못된 형식의 email
-            "seller",
+            generateUsername(),
             "password"
         );
 
@@ -179,7 +180,7 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
-            "seller",
+            generateUsername(),
             null // password 속성 없음
         );
         // Act
@@ -205,7 +206,7 @@ public class POST_specs {
         // Arrange
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
-            "seller",
+            generateUsername(),
             password // 잘못된 형식의 password
         );
         // Act
@@ -226,7 +227,7 @@ public class POST_specs {
         String email = generateEmail();
         CreateSellerCommand command = new CreateSellerCommand(
             email,
-            "seller",
+            generateUsername(),
             "password"
         );
         client.postForEntity("/seller/signup", command, Void.class);
@@ -234,7 +235,31 @@ public class POST_specs {
         // Act
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/signup",
-            new CreateSellerCommand(email, "seller", "password"), // 요청 본문
+            new CreateSellerCommand(email, generateUsername(), "password"), // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void 이미_존재하는_사용자_이름으로_요청하면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String username = generateUsername();
+        CreateSellerCommand command = new CreateSellerCommand(
+            generateEmail(),
+            username,
+            "password"
+        );
+        client.postForEntity("/seller/signup", command, Void.class);
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            new CreateSellerCommand(generateEmail(), username, "password"), // 요청 본문
             Void.class // 응답 본문
         );
 

@@ -26,6 +26,7 @@ public record SellerSignUpController(SellerRepository sellerRepository) {
 
         Seller seller = new Seller();
         seller.setEmail(command.email());
+        seller.setUsername(command.username());
         try {
             sellerRepository.save(seller);
         } catch (DataIntegrityViolationException e) {
