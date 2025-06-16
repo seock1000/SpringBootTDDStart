@@ -1,6 +1,8 @@
 package test.commerce.api.seller.signup;
 
 import commerce.CommerceApiApp;
+import commerce.Seller;
+import commerce.SellerRepository;
 import commerce.command.CreateSellerCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
+import static test.commerce.PasswordGenerator.generatePassword;
 import static test.commerce.UsernameGenerator.generateUsername;
 
 @SpringBootTest(
@@ -265,5 +269,41 @@ public class POST_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    /**
+     * 비밀번호의 암호화 여부는 클라이언트 측에서 확인할 수 없으므로,
+     * 서버 측에서 비밀번호가 올바르게 암호화되었는지 확인하는 테스트입니다.
+     * 때문에 구현에 의존하는 테스트가 될 수 있습니다.
+     */
+    @Test
+    void 비밀번호를_올바르게_암호화_한다(
+        @Autowired TestRestTemplate client,
+        @Autowired SellerRepository sellerRepository,
+        @Autowired PasswordEncoder encoder
+    ) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(
+            generateEmail(),
+            generateUsername(),
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        Seller seller = sellerRepository.findAll()
+            .stream()
+            .filter(it -> it.getEmail().equals(command.email()))
+            .findFirst()
+            .orElseThrow();
+        String actual = seller.getHashedPassword();
+        assertThat(actual).isNotNull();
+        assertThat(encoder.matches(command.password(), actual)).isTrue();
     }
 }
