@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import test.commerce.JwtAssertions;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.PasswordGenerator.generatePassword;
@@ -77,5 +79,30 @@ public class POST_specs {
         // Assert
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().accessToken()).isNotNull();
+    }
+
+    @Test
+    void 접근_토큰은_JWT_형식을_따른다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        client.postForEntity(
+            "/seller/signup",
+            new CreateSellerCommand(email, generateUsername(), password),
+            Void.class // 응답 본문
+        );
+
+        // Act
+        var response = client.postForEntity(
+            "/seller/issueToken",
+            new IssueSellerToken(email,password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+
+        // Assert
+        String actual = requireNonNull(response.getBody()).accessToken();
+        assertThat(actual).satisfies(JwtAssertions::conformsToJwtFormat);
     }
 }
