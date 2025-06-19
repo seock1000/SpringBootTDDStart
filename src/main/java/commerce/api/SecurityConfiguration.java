@@ -22,6 +22,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/seller/signup").permitAll() // /seller/signup 경로는 인증 없이 접근 허용
+                .requestMatchers("/seller/issueToken").permitAll()
             )
             .build();
     }
