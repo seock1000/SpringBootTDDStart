@@ -124,4 +124,30 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void 잘못된_비밀번호가_사용되면_400_Bad_Request_상태코드를_반환한다(
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String wrongPassword = generatePassword();
+
+        client.postForEntity(
+            "/seller/signup",
+            new CreateSellerCommand(email, generateUsername(), password),
+            Void.class // 응답 본문
+        );
+
+        // Act
+        var response = client.postForEntity(
+            "/seller/issueToken",
+            new IssueSellerToken(email, wrongPassword),
+            AccessTokenCarrier.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
