@@ -105,4 +105,23 @@ public class POST_specs {
         String actual = requireNonNull(response.getBody()).accessToken();
         assertThat(actual).satisfies(JwtAssertions::conformsToJwtFormat);
     }
+
+    @Test
+    void 존재하지_않는_이메일_주소로_요청하면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+
+        // Act
+        var response = client.postForEntity(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
