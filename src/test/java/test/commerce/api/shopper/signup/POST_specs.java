@@ -227,4 +227,31 @@ public class POST_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
+    @Test
+    void 이미_존재하는_이메일_주소로_요청하면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
+
+        // 이미 존재하는 이메일로 회원가입 요청
+        client.postForEntity(
+            "/shopper/signup",
+            new CreateShopperCommand(email, username, password),
+            Void.class // 응답 본문
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signup",
+            new CreateShopperCommand(email, generateUsername(), password),
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
 }
