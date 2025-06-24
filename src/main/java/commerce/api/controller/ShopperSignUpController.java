@@ -6,8 +6,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static commerce.UserPropertyValidator.isEmailValid;
+
 @RestController
 public record ShopperSignUpController() {
+
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     @PostMapping("/shopper/signup")
     ResponseEntity<?> signUp(
@@ -20,6 +24,6 @@ public record ShopperSignUpController() {
     }
 
     private static boolean isCommandValid(CreateShopperCommand command) {
-        return command.email() != null;
+        return isEmailValid(command.email());
     }
 }
