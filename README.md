@@ -127,7 +127,7 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
   ```
 - curl 명령 예시:
   - ```bash
-    curl -i -X POST 'http://localhost:8080/shopper/signUp' \
+    curl -i -X POST 'http://localhost:8080/shopper/signup' \
     -H 'Content-Type: application/json' \
     -d '{
       "email": "shopper1@example.com",
@@ -147,8 +147,8 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - 비밀번호는 8자 이상의 문자로 구성되어야 한다.
 
 테스트
-- [ ] 올바르게 요청하면 204 NO_CONTENT 응답을 반환한다.
-- [ ] email 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [x] 올바르게 요청하면 204 NO_CONTENT 응답을 반환한다.
+- [x] email 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] email 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] username 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다.
 - [ ] username 속성이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
