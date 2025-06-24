@@ -11,8 +11,6 @@ import static commerce.UserPropertyValidator.isEmailValid;
 @RestController
 public record ShopperSignUpController() {
 
-    private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
-
     @PostMapping("/shopper/signup")
     ResponseEntity<?> signUp(
         @RequestBody CreateShopperCommand command
