@@ -1,5 +1,7 @@
 package test.commerce.api.shopper.signup;
 
+import commerce.Shopper;
+import commerce.ShopperRepository;
 import commerce.command.CreateShopperCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import test.CommerceApiTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -281,4 +284,35 @@ public class POST_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
+    @Test
+    void 비밀번호를_올바르게_암호화_한다(
+        @Autowired TestRestTemplate client,
+        @Autowired ShopperRepository shopperRepository,
+        @Autowired PasswordEncoder passwordEncoder
+        ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+            generateEmail(),
+            generateUsername(),
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        Shopper shopper = shopperRepository
+            .findAll()
+            .stream()
+            .filter(it -> it.getEmail().equals(command.email()))
+            .findFirst()
+            .orElseThrow();
+        String actual = shopper.getHashedPassword();
+        assertThat(actual).isNotNull();
+        assertThat(passwordEncoder.matches(command.password(), actual)).isTrue();
+    }
 }
