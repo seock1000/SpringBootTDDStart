@@ -114,4 +114,36 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "",
+        "sh",
+        "shopper ",
+        "shopper@",
+        "shopper.",
+        "shopper!",
+    })
+    void username_속성이_올바른_형식을_따르지_않으면_400_BAD_REQUEST_응답을_반환한다(
+        String username,
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        CreateShopperCommand command = new CreateShopperCommand(
+            generateEmail(),
+            username, // 잘못된 형식의 username
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }

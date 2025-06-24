@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static commerce.UserPropertyValidator.isEmailValid;
+import static commerce.UserPropertyValidator.isUsernameValid;
 
 @RestController
 public record SellerSignUpController(
     PasswordEncoder passwordEncoder,
     SellerRepository sellerRepository
 ) {
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9_-]{3,}$";
 
     @PostMapping("/seller/signup")
     ResponseEntity<?> signUp(
@@ -53,7 +53,4 @@ public record SellerSignUpController(
         return password != null && password.length() >= 8;
     }
 
-    private static boolean isUsernameValid(String username) {
-        return username != null && username.matches(USERNAME_REGEX);
-    }
 }
