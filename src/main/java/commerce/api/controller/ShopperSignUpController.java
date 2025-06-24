@@ -13,10 +13,13 @@ public record ShopperSignUpController() {
     ResponseEntity<?> signUp(
         @RequestBody CreateShopperCommand command
     ) {
-        if (command.email() == null) {
+        if (!isCommandValid(command)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();
     }
 
+    private static boolean isCommandValid(CreateShopperCommand command) {
+        return command.email() != null;
+    }
 }
