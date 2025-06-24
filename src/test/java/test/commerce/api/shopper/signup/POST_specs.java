@@ -146,4 +146,37 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+
+    // red-green-refactor 범위를 벗어나는 테스트(바로 성공)
+    // 일부러 정규식을 망가뜨리는 등 수정한 뒤 테스트하여 실패 케이스를 확인하여 신뢰도를 얻을 수 있음
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "abcdefghijklmnopqrstuvwxyz",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "0123456789",
+        "shopper-",
+        "shopper_",
+    })
+    void username_속성이_올바른_형식을_따르면_204_NO_CONTENT_응답을_반환한다(
+        String username,
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        CreateShopperCommand command = new CreateShopperCommand(
+            generateEmail(),
+            username, // 올바른 형식의 username
+            generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+    }
 }
