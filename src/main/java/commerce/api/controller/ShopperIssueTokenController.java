@@ -8,6 +8,7 @@ import commerce.result.AccessTokenCarrier;
 import io.jsonwebtoken.Jwts;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public record ShopperIssueTokenController(
     JwtKeyHolder jwtKeyHolder,
-    ShopperRepository shopperRepository
+    ShopperRepository shopperRepository,
+    PasswordEncoder passwordEncoder
 ) {
 
     @PostMapping("/shopper/issueToken")
@@ -24,6 +26,9 @@ public record ShopperIssueTokenController(
         ) {
         return shopperRepository
             .findByEmail(query.email())
+            .filter(shopper ->
+                passwordEncoder.matches(query.password(), shopper.getHashedPassword())
+            )
             .map(shopper -> composeToken())
             .map(AccessTokenCarrier::new)
             .map(ResponseEntity::ok)

@@ -93,4 +93,30 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
+
+    @Test
+    void 잘못된_비밀번호가_사용되면_400_BAD_REQUEST_응답을_반환한다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String wrongPassword = generatePassword();
+
+        client.postForEntity(
+            "/shopper/signup",
+            new CreateShopperCommand(email, generateUsername(), password),
+            Void.class // 응답 본문
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/shopper/issueToken",
+            new IssueShopperToken(email, wrongPassword), // 잘못된 비밀번호 사용
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
 }
