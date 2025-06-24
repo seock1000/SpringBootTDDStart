@@ -2,6 +2,7 @@ package commerce.api.controller;
 
 import commerce.Seller;
 import commerce.SellerRepository;
+import commerce.api.JwtKeyHolder;
 import commerce.query.IssueSellerToken;
 import commerce.result.AccessTokenCarrier;
 import io.jsonwebtoken.Jwts;
@@ -16,9 +17,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 @RestController
 public record SellerIssueTokenController(
-    @Value("${security.jwt.secret}") String jwtSecret,
     PasswordEncoder passwordEncoder,
-    SellerRepository sellerRepository
+    SellerRepository sellerRepository,
+    JwtKeyHolder jwtKeyHolder
 ) {
 
     @PostMapping("/seller/issueToken")
@@ -32,11 +33,9 @@ public record SellerIssueTokenController(
     }
 
     private String composeToken() {
-        return Jwts.builder()
-            .signWith(new SecretKeySpec(
-                jwtSecret.getBytes(),
-                "HmacSHA256"
-            ))
+        return Jwts
+            .builder()
+            .signWith(jwtKeyHolder.key())
             .compact();
     }
 }
