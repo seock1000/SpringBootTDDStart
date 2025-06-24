@@ -24,6 +24,7 @@ public record ShopperSignUpController() {
 
     private static boolean isCommandValid(CreateShopperCommand command) {
         return isEmailValid(command.email())
-            && isUsernameValid(command.username());
+            && isUsernameValid(command.username())
+            && command.password() != null;
     }
 }
