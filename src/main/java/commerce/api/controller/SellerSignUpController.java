@@ -34,12 +34,7 @@ public record SellerSignUpController(
         seller.setEmail(command.email());
         seller.setUsername(command.username());
         seller.setHashedPassword(hashedPassword);
-        try {
-            sellerRepository.save(seller);
-        } catch (DataIntegrityViolationException e) {
-            // 이메일 중복 오류 처리
-            return ResponseEntity.badRequest().build();
-        }
+        sellerRepository.save(seller);
 
         return ResponseEntity.noContent().build();
     }

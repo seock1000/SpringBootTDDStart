@@ -28,12 +28,7 @@ public record ShopperSignUpController(
 
         var shopper = new Shopper();
         shopper.setEmail(command.email());
-        try {
-            shopperRepository.save(shopper);
-        } catch (DataIntegrityViolationException e) {
-            // 이메일 중복 오류 처리
-            return ResponseEntity.badRequest().build();
-        }
+        shopperRepository.save(shopper);
         return ResponseEntity.noContent().build();
     }
 
