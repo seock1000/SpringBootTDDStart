@@ -114,4 +114,47 @@ public class GET_specs {
         // Assert
         assertThat(response1.getBody().id()).isNotEqualTo(response2.getBody().id());
     }
+
+    @Test
+    void 같은_판매자의_식별자는_항상_같다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String username = generateUsername();
+
+        var command = new CreateSellerCommand(email, username, password);
+        client.postForEntity("/seller/signup", command, Void.class);
+        AccessTokenCarrier carrier1 = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        AccessTokenCarrier carrier2 = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        String token1 = carrier1.accessToken();
+        String token2 = carrier2.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response1 = client.exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token1)
+                .build(),
+            SellerMeView.class
+        );
+
+        ResponseEntity<SellerMeView> response2 = client.exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token2)
+                .build(),
+            SellerMeView.class
+        );
+
+        // Assert
+        assertThat(response1.getBody().id()).isEqualTo(response2.getBody().id());
+    }
 }
