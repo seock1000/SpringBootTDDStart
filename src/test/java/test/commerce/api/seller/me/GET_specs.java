@@ -157,4 +157,36 @@ public class GET_specs {
         // Assert
         assertThat(response1.getBody().id()).isEqualTo(response2.getBody().id());
     }
+
+    @Test
+    void 판매자의_기본_정보가_올바르게_설정된다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String username = generateUsername();
+
+        var command = new CreateSellerCommand(email, username, password);
+        client.postForEntity("/seller/signup", command, Void.class);
+        AccessTokenCarrier carrier = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        String token = carrier.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response = client.exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token)
+                .build(),
+            SellerMeView.class
+        );
+
+        // Assert
+        SellerMeView actual = response.getBody();
+        assertThat(actual.email()).isEqualTo(email);
+        assertThat(actual.username()).isEqualTo(username);
+    }
 }
