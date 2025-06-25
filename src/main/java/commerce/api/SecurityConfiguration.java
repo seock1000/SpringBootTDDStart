@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/seller/issueToken").permitAll()
                 .requestMatchers("/shopper/signup").permitAll() // /shopper/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/shopper/issueToken").permitAll()
+                .requestMatchers("/seller/me").permitAll()
             )
             .build();
     }

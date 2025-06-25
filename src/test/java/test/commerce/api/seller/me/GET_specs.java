@@ -41,7 +41,7 @@ public class GET_specs {
 
         // Act
         ResponseEntity<SellerMeView> response = client.exchange(
-            get("seller/me")
+            get("/seller/me")
                 .header("Authorization", "Bearer " + token)
                 .build(),
             SellerMeView.class
