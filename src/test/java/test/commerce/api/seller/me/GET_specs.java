@@ -64,4 +64,54 @@ public class GET_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
+
+    @Test
+    void 서로_다른_판매자의_식별자는_서로_다르다(
+        @Autowired TestRestTemplate client // Client 역할
+    ) {
+        // Arrange
+        String email1 = generateEmail();
+        String password1 = generatePassword();
+        String username1 = generateUsername();
+
+        var command1 = new CreateSellerCommand(email1, username1, password1);
+        client.postForEntity("/seller/signup", command1, Void.class);
+        AccessTokenCarrier carrier1 = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email1, password1),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        String token1 = carrier1.accessToken();
+
+        String email2 = generateEmail();
+        String password2 = generatePassword();
+        String username2 = generateUsername();
+
+        var command2 = new CreateSellerCommand(email2, username2, password2);
+        client.postForEntity("/seller/signup", command2, Void.class);
+        AccessTokenCarrier carrier2 = client.postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email2, password2),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        String token2 = carrier2.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response1 = client.exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token1)
+                .build(),
+            SellerMeView.class
+        );
+
+        ResponseEntity<SellerMeView> response2 = client.exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token2)
+                .build(),
+            SellerMeView.class
+        );
+
+        // Assert
+        assertThat(response1.getBody().id()).isNotEqualTo(response2.getBody().id());
+    }
 }
