@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -27,15 +29,23 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    JwtDecoder jwtDecoder(JwtKeyHolder jwtKeyHolder) {
+        return NimbusJwtDecoder.withSecretKey(jwtKeyHolder.key()).build();
+    }
+
+    @Bean
+    DefaultSecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        JwtDecoder jwtDecoder) throws Exception {
         return http
             .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화
+            .oauth2ResourceServer(c -> c.jwt(jwt -> jwt.decoder(jwtDecoder))) // JWT 디코더 설정
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/seller/signup").permitAll() // /seller/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/seller/issueToken").permitAll()
+                .requestMatchers("/seller/me").authenticated()
                 .requestMatchers("/shopper/signup").permitAll() // /shopper/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/shopper/issueToken").permitAll()
-                .requestMatchers("/seller/me").permitAll()
             )
             .build();
     }
