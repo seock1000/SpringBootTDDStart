@@ -1,15 +1,13 @@
 package test.commerce.api.seller.issuetoken;
 
-import commerce.CommerceApiApp;
 import commerce.command.CreateSellerCommand;
 import commerce.query.IssueSellerToken;
 import commerce.result.AccessTokenCarrier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import test.CommerceApiTest;
+import test.commerce.api.CommerceApiTest;
 import test.commerce.JwtAssertions;
 
 import static java.util.Objects.requireNonNull;
