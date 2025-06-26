@@ -228,4 +228,37 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] 접근 토큰을 사용하지 않으면 401 UNAUTHORIZED 응답을 반환한다.
 - [x] 서로 다른 판매자의 식별자는 서로 다르다.
 - [x] 같은 판매자의 식별자는 항상 같다.
-- [ ] 판매자의 기본 정보가 올바르게 설정된다.
+- [x] 판매자의 기본 정보가 올바르게 설정된다.
+
+
+### 구매자 정보 조회
+
+요청
+- 메서드: GET
+- 경로: /shopper/me
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+  ```
+- curl 명령 예시:
+  ```bash
+  curl -i -X GET 'http://localhost:8080/shopper/me' \
+  -H 'Authorization
+  : Bearer {token}'
+  ```
+성공 응답:
+- 상태 코드: 200 OK
+- 본문:
+  ```
+  ShopperMeView {
+    id: String(UUID),
+    email: String,
+    username: String
+  }
+  ```
+테스트
+- [ ] 올바른 접근 토큰을 사용하면 200 OK 응답을 반환한다.
+- [ ] 접근 토큰을 사용하지 않으면 401 UNAUTHORIZED 응답을 반환한다.
+- [ ] 서로 다른 구매자의 식별자는 서로 다르다.
+- [ ] 같은 구매자의 식별자는 항상 같다.
+- [ ] 구매자의 기본 정보가 올바르게 설정된다.
