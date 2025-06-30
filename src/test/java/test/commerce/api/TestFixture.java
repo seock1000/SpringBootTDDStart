@@ -5,6 +5,10 @@ import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
+import static test.commerce.EmailGenerator.generateEmail;
+import static test.commerce.PasswordGenerator.generatePassword;
+import static test.commerce.UsernameGenerator.generateUsername;
+
 public record TestFixture(
     TestRestTemplate client
 ) {
@@ -19,5 +23,13 @@ public record TestFixture(
             new IssueShopperToken(email, password),
             AccessTokenCarrier.class // 응답 본문
         ).accessToken();
+    }
+
+    public String createShopperThenIssueToken() {
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
+        createShopper(email, username, password);
+        return issueShopperToken(email, password);
     }
 }

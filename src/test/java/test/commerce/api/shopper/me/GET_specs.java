@@ -71,16 +71,8 @@ public class GET_specs {
         @Autowired TestFixture fixture // Client 역할
     ) {
         // Arrange
-        String email1 = generateEmail();
-        String password1 = generatePassword();
-        String email2 = generateEmail();
-        String password2 = generatePassword();
-
-        fixture.createShopper(email1, generateUsername(), password1);
-        fixture.createShopper(email2, generateUsername(), password2);
-
-        String token1 = fixture.issueShopperToken(email1, password1);
-        String token2 = fixture.issueShopperToken(email2, password2);
+        String token1 = fixture.createShopperThenIssueToken();
+        String token2 = fixture.createShopperThenIssueToken();
 
         // Act
         ResponseEntity<ShopperMeView> response1 = fixture.client().exchange(
