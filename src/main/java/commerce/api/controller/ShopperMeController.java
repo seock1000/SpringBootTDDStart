@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @RestController
 public record ShopperMeController(
-    PasswordEncoder encoder,
     ShopperRepository repository
 ) {
 
