@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/seller/me").authenticated()
                 .requestMatchers("/shopper/signup").permitAll() // /shopper/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/shopper/issueToken").permitAll()
+                .requestMatchers("/shopper/me").permitAll()
             )
             .build();
     }
