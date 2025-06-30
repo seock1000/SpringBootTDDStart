@@ -29,21 +29,14 @@ public class GET_specs {
         // Arrange
         String email = generateEmail();
         String password = generatePassword();
-        String username = generateUsername();
 
-        var command = new CreateShopperCommand(email, username, password);
-        fixture.client().postForEntity("/shopper/signup", command, Void.class);
-
-        var carrier = fixture.client().postForObject(
-            "/shopper/issueToken",
-            new IssueShopperToken(email, password),
-            AccessTokenCarrier.class // 응답 본문
-        );
+        fixture.createShopper(email, generateUsername(), password);
+        String token = fixture.issueShopperToken(email, password); ;
 
         // Act
         ResponseEntity<ShopperMeView> response = fixture.client().exchange(
             get("/shopper/me")
-                .header("Authorization", "Bearer " + carrier.accessToken())
+                .header("Authorization", "Bearer " + token)
                 .build(),
             ShopperMeView.class
         );
