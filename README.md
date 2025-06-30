@@ -261,4 +261,87 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] 접근 토큰을 사용하지 않으면 401 UNAUTHORIZED 응답을 반환한다.
 - [x] 서로 다른 구매자의 식별자는 서로 다르다.
 - [x] 같은 구매자의 식별자는 항상 같다.
-- [ ] 구매자의 기본 정보가 올바르게 설정된다.
+- [x] 구매자의 기본 정보가 올바르게 설정된다.
+
+
+### 판매자 상품 등록
+요청
+- 메서드: POST
+- 경로: /seller/products
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+    Content-Type: application/json
+  ```
+- 본문:
+  ```
+  RegisterProductCommand {
+    name: String,
+    imgUrl: String,
+    description: String,
+    priceAmount: number,
+    stockQuantity: number
+  }
+  ```
+- curl 명령 예시:
+  ```bash
+  curl -i -X POST 'http://localhost:8080/seller/products
+  -H 'Authorization: Bearer {token}'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "상품 이름",
+    "imgUrl": "https://example.com/product.jpg",
+    "description": "상품 설명",
+    "priceAmount": 10000,
+    "stockQuantity": 50
+  }'
+  ```
+성공 응답:
+- 상태 코드: 201 CREATED
+- 헤더:
+  ```
+    Location: /seller/products/{id}
+  ```
+  
+테스트
+- [ ] 올바르게 요청하면 201 CREATED 응답을 반환한다.
+- [ ] 판매자가 아닌 사용자가 요청하면 403 FORBIDDEN 응답을 반환한다.
+- [ ] 이미지 URL이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
+- [ ] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다.
+
+### 판매자 상품 조회
+요청
+- 메서드: GET
+- 경로: /seller/products/{id}
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+  ```
+- curl 명령 예시:
+  ```bash
+  curl -i -X GET 'http://localhost:8080/seller/products
+  -H 'Authorization: Bearer {token}'
+  ```
+성공 응답:
+- 상태 코드: 200 OK
+- 본문:
+  ```
+  SellerProductView {
+    id: String(UUID),
+    name: String,
+    imgUrl: String,
+    description: String,
+    priceAmount: number,
+    stockQuantity: number,
+    registeredTimeUtc: String(YYYY-MM-DDTHH:mm:ss.sss)
+  }
+  ```
+  
+테스트
+- [ ] 올바른 접근 토큰을 사용하면 200 OK 응답을 반환한다.
+- [ ] 판매자가 아닌 사용자가 요청하면 403 FORBIDDEN 응답을 반환한다.
+- [ ] 존재하지 않는 상품 ID를 사용하면 404 NOT_FOUND 응답을 반환한다.
+- [ ] 다른 판매자가 등록한 상품 ID를 사용하면 404 NOT_FOUND 응답을 반환한다.
+- [ ] 상품 식별자를 올바르게 반환한다.
+- [ ] 상품 정보를 올바르게 반환한다.
+- [ ] 상품 등록 시간을 올바르게 반환한다.
