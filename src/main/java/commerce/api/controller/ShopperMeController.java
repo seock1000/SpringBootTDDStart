@@ -2,7 +2,7 @@ package commerce.api.controller;
 
 import commerce.ShopperRepository;
 import commerce.view.ShopperMeView;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,10 +15,13 @@ public record ShopperMeController(
 ) {
 
     @GetMapping("/shopper/me")
-    public ShopperMeView me(
+    public ResponseEntity<ShopperMeView> me(
         Principal user
     ) {
         UUID id = UUID.fromString(user.getName());
-        return new ShopperMeView(id, null, null);
+        return repository.findById(id)
+            .map(ShopperMeView::new)
+            .map(ResponseEntity::ok)
+            .orElseThrow();
     }
 }
