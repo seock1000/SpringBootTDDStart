@@ -66,4 +66,39 @@ public class GET_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(401);
     }
 
+    @Test
+    void 서로_다른_구매자의_식별자는_서로_다르다(
+        @Autowired TestFixture fixture // Client 역할
+    ) {
+        // Arrange
+        String email1 = generateEmail();
+        String password1 = generatePassword();
+        String email2 = generateEmail();
+        String password2 = generatePassword();
+
+        fixture.createShopper(email1, generateUsername(), password1);
+        fixture.createShopper(email2, generateUsername(), password2);
+
+        String token1 = fixture.issueShopperToken(email1, password1);
+        String token2 = fixture.issueShopperToken(email2, password2);
+
+        // Act
+        ResponseEntity<ShopperMeView> response1 = fixture.client().exchange(
+            get("/shopper/me")
+                .header("Authorization", "Bearer " + token1)
+                .build(),
+            ShopperMeView.class
+        );
+
+        ResponseEntity<ShopperMeView> response2 = fixture.client().exchange(
+            get("/shopper/me")
+                .header("Authorization", "Bearer " + token2)
+                .build(),
+            ShopperMeView.class
+        );
+
+        // Assert
+        assertThat(response1.getBody().id()).isNotEqualTo(response2.getBody().id());
+    }
+
 }
