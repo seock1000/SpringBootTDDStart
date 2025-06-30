@@ -43,10 +43,9 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/seller/signup").permitAll() // /seller/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/seller/issueToken").permitAll()
-                .requestMatchers("/seller/me").authenticated()
                 .requestMatchers("/shopper/signup").permitAll() // /shopper/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/shopper/issueToken").permitAll()
-                .requestMatchers("/shopper/me").permitAll()
+                .anyRequest().authenticated() // 나머지 경로는 인증 필요
             )
             .build();
     }

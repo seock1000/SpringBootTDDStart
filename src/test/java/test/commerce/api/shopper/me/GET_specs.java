@@ -45,4 +45,25 @@ public class GET_specs {
         assertThat(response.getStatusCode().value()).isEqualTo(200);
     }
 
+    @Test
+    void 접근_토큰을_사용하지_않으면_401_UNAUTHORIZED_응답을_반환한다(
+        @Autowired TestFixture fixture // Client 역할
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+
+        fixture.createShopper(email, generateUsername(), password);
+
+        // Act
+        ResponseEntity<ShopperMeView> response = fixture.client().exchange(
+            get("/shopper/me")
+                .build(),
+            ShopperMeView.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
+    }
+
 }
