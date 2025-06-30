@@ -1,6 +1,7 @@
 package test.commerce.api;
 
 import commerce.command.CreateShopperCommand;
+import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -36,12 +37,44 @@ public record TestFixture(
 
     public void setShopperAsDefaultUser(String email, String password) {
         String token = issueShopperToken(email, password);
+        String authorization = "Bearer " + token;
+        setDefaultAuthorization(authorization);
+    }
+
+    private void setDefaultAuthorization(String authorization) {
         RestTemplate template = client().getRestTemplate();
         template.getInterceptors().add((request, body, execution) -> {
             if(!request.getHeaders().containsKey("Authorization")) {
-                request.getHeaders().add("Authorization", "Bearer " + token);
+                request.getHeaders().add("Authorization", authorization);
             }
             return execution.execute(request, body);
         });
+    }
+
+    public void createSellerThenSetAsDefaultUser() {
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
+        createSeller(email, username, password);
+        setSellerAsDefaultUser(email, password);
+    }
+
+    private void createSeller(String email, String username, String password) {
+        var command = new CreateShopperCommand(email, username, password);
+        client().postForEntity("/seller/signup", command, Void.class);
+    }
+
+    private void setSellerAsDefaultUser(String email, String password) {
+        String token = issueSellerToken(email, password);
+        String authorization = "Bearer " + token;
+        setDefaultAuthorization(authorization);
+    }
+
+    private String issueSellerToken(String email, String password) {
+        return client().postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        ).accessToken();
     }
 }

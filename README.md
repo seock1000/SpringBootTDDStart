@@ -277,7 +277,7 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
   ```
   RegisterProductCommand {
     name: String,
-    imgUrl: String,
+    imgUri: String,
     description: String,
     priceAmount: number,
     stockQuantity: number
