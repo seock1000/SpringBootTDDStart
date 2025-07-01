@@ -18,6 +18,16 @@ public class RegisterProductCommandGenerator {
         );
     }
 
+    public static RegisterProductCommand generateRegisterProductCommandWithImageUrl(String imageUrl) {
+        return new RegisterProductCommand(
+            generateProductName(),
+            imageUrl,
+            generateProductDescription(),
+            generateProductPriceAmount(),
+            generateProductStockQuantity()
+        );
+    }
+
     private static String generateProductName() {
         return "name" + UUID.randomUUID();
     }
