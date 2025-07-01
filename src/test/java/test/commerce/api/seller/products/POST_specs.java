@@ -31,4 +31,22 @@ public class POST_specs {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(201);
     }
+
+    @Test
+    void 판매자가_아닌_사용자가_요청하면_403_Forbidden_응답을_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<Void> response = fixture.client().postForEntity(
+            "/seller/products",
+            generateRegisterProductCommand(),
+            Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
+    }
 }

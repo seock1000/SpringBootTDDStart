@@ -77,4 +77,13 @@ public record TestFixture(
             AccessTokenCarrier.class // 응답 본문
         ).accessToken();
     }
+
+    public String createShopperThenSetAsDefaultUser() {
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
+        createShopper(email, username, password);
+        setShopperAsDefaultUser(email, password);
+        return issueShopperToken(email, password);
+    }
 }
