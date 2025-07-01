@@ -43,7 +43,7 @@ public record TestFixture(
 
     private void setDefaultAuthorization(String authorization) {
         RestTemplate template = client().getRestTemplate();
-        template.getInterceptors().add((request, body, execution) -> {
+        template.getInterceptors().addFirst((request, body, execution) -> {
             if(!request.getHeaders().containsKey("Authorization")) {
                 request.getHeaders().add("Authorization", authorization);
             }
