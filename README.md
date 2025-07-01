@@ -307,7 +307,7 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] 올바르게 요청하면 201 CREATED 응답을 반환한다.
 - [x] 판매자가 아닌 사용자가 요청하면 403 FORBIDDEN 응답을 반환한다.
 - [x] 이미지 URL이 올바른 형식을 따르지 않으면 400 BAD_REQUEST 응답을 반환한다.
-- [ ] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다.
+- [x] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다.
 
 ### 판매자 상품 조회
 요청
