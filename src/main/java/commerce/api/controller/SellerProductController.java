@@ -13,19 +13,13 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-public record SellerProductController(
-    SellerRepository repository
-) {
+public record SellerProductController() {
 
     @PostMapping("/seller/products")
     public ResponseEntity<?> registerProduct(
-        Principal user,
         @RequestBody RegisterProductCommand command
     ) {
-        UUID id = UUID.fromString(user.getName());
-        if(repository.findById(id).isEmpty()) {
-            return ResponseEntity.status(403).build();
-        } else if(!isValidUrl(command.imgUri())) {
+        if(!isValidUrl(command.imgUri())) {
             return ResponseEntity.badRequest().build();
         }
         URI location = URI.create("/seller/products/" + UUID.randomUUID());
