@@ -14,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.springframework.security.oauth2.core.authorization.OAuth2AuthorizationManagers.hasScope;
+
 @Configuration
 public class SecurityConfiguration {
 
@@ -43,6 +45,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/seller/signup").permitAll() // /seller/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/seller/issueToken").permitAll()
+                .requestMatchers("/seller/**").access(hasScope("seller"))
                 .requestMatchers("/shopper/signup").permitAll() // /shopper/signup 경로는 인증 없이 접근 허용
                 .requestMatchers("/shopper/issueToken").permitAll()
                 .anyRequest().authenticated() // 나머지 경로는 인증 필요
