@@ -1,19 +1,36 @@
 package test.commerce.api;
 
 import commerce.command.CreateShopperCommand;
+import commerce.command.RegisterProductCommand;
 import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
+import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.Objects;
+import java.util.UUID;
 
 import static test.commerce.EmailGenerator.generateEmail;
 import static test.commerce.PasswordGenerator.generatePassword;
+import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
 import static test.commerce.UsernameGenerator.generateUsername;
 
 public record TestFixture(
     TestRestTemplate client
 ) {
+    public static TestFixture create(Environment environment) {
+        var client = new TestRestTemplate();
+        var uriTemplateHandler = new LocalHostUriTemplateHandler(environment);
+        client.setUriTemplateHandler(uriTemplateHandler);
+        return new TestFixture(client);
+    }
+
     public void createShopper(String email, String username, String password) {
         var command = new CreateShopperCommand(email, username, password);
         client().postForEntity("/shopper/signup", command, Void.class);
@@ -78,12 +95,22 @@ public record TestFixture(
         ).accessToken();
     }
 
-    public String createShopperThenSetAsDefaultUser() {
+    public void createShopperThenSetAsDefaultUser() {
         String email = generateEmail();
         String username = generateUsername();
         String password = generatePassword();
         createShopper(email, username, password);
         setShopperAsDefaultUser(email, password);
-        return issueShopperToken(email, password);
+    }
+
+    public UUID registerProduct() {
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/products",
+            generateRegisterProductCommand(),
+            Void.class
+        );
+        URI location = Objects.requireNonNull(response.getHeaders().getLocation());
+        String id = location.getPath().substring("/seller/products/".length());
+        return UUID.fromString(id);
     }
 }
