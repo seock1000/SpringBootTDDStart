@@ -345,3 +345,42 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] 상품 식별자를 올바르게 반환한다.
 - [x] 상품 정보를 올바르게 반환한다.
 - [x] 상품 등록 시간을 올바르게 반환한다.
+
+
+### 판매자 상품 목록 조회
+요청
+- 메서드: GET 
+- 경로: /seller/products
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+  ```
+- curl 명령 예시:
+  ```bash
+  curl -i -X GET 'http://localhost:8080/seller/products'
+  -H 'Authorization: Bearer {token}'
+  ```
+성공 응답:
+- 상태 코드: 200 OK
+- 본문:
+  ```
+  ArrayCarrier<SellerProductView> {
+    items: [SellerProductView {
+      id: String(UUID),
+      name: String,
+      imgUrl: String,
+      description: String,
+      priceAmount: number,
+      stockQuantity: number,
+      registeredTimeUtc: String(YYYY-MM-DDTHH:mm:ss.sss)
+    }]
+  }
+  ```
+
+테스트
+- [ ] 올바르게 요청하면 200 OK 응답을 반환한다
+- [ ] 판매자가 등록한 모든 상품을 반환한다
+- [ ] 다른 판매자가 등록한 상품이 포함되지 않는다
+- [ ] 상품 정보를 올바르게 반환한다
+- [ ] 상품 등록 시간을 올바르게 반환한다
+- [ ] 상품 목록을 등록시점 역순으로 정렬한다
