@@ -4,6 +4,7 @@ import commerce.Product;
 import commerce.ProductRepository;
 import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.view.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,6 +78,20 @@ public record SellerProductController(ProductRepository repository) {
     }
 
     @GetMapping("/seller/products")
-    void findAllProducts() {
+    ResponseEntity<ArrayCarrier<SellerProductView>> findAllProducts() {
+        SellerProductView[] items = repository
+            .findAll()
+            .stream()
+            .map(product -> new SellerProductView(
+                product.getId(),
+                null,
+                null,
+                null,
+                null,
+                0,
+                null
+            ))
+            .toArray(SellerProductView[]::new);
+        return ResponseEntity.ok(new ArrayCarrier<>(items));
     }
 }

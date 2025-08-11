@@ -12,6 +12,11 @@ import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
 
@@ -35,5 +40,28 @@ public class GET_specs {
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    void 판매자가_등록한_모든_상품을_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        List<UUID> expects = fixture.registerProducts();
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response =
+            fixture.client().exchange(
+                get("/seller/products").build(),
+                new ParameterizedTypeReference<>() {}
+            );
+
+        // Assert
+        ArrayCarrier<SellerProductView> actual = response.getBody();
+        assertThat(actual).isNotNull();
+        assertThat(actual.items())
+            .extracting(SellerProductView::id)
+            .containsAll(expects);
     }
 }

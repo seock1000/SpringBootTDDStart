@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -116,5 +117,9 @@ public record TestFixture(
         URI location = Objects.requireNonNull(response.getHeaders().getLocation());
         String id = location.getPath().substring("/seller/products/".length());
         return UUID.fromString(id);
+    }
+
+    public List<UUID> registerProducts() {
+        return List.of(registerProduct(), registerProduct(), registerProduct());
     }
 }
