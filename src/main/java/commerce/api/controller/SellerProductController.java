@@ -78,9 +78,11 @@ public record SellerProductController(ProductRepository repository) {
     }
 
     @GetMapping("/seller/products")
-    ResponseEntity<ArrayCarrier<SellerProductView>> findAllProducts() {
+    ResponseEntity<ArrayCarrier<SellerProductView>> findAllProducts(
+        Principal user
+    ) {
         SellerProductView[] items = repository
-            .findAll()
+            .findBySellerId(UUID.fromString(user.getName()))
             .stream()
             .map(product -> new SellerProductView(
                 product.getId(),

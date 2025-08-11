@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
@@ -63,5 +64,30 @@ public class GET_specs {
         assertThat(actual.items())
             .extracting(SellerProductView::id)
             .containsAll(expects);
+    }
+
+    @Test
+    void 다른_판매자가_등록한_상품이_포함되지_않는다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        List<UUID> notExpected = fixture.registerProducts();
+
+        fixture.createSellerThenSetAsDefaultUser();
+        List<UUID> expects = fixture.registerProducts();
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response =
+            fixture.client().exchange(
+                get("/seller/products").build(),
+                new ParameterizedTypeReference<>() {}
+            );
+
+        // Assert
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(SellerProductView::id)
+            .containsAll(expects)
+            .doesNotContainAnyElementsOf(notExpected);
     }
 }
