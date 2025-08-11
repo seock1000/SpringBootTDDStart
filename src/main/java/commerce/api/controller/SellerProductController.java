@@ -75,4 +75,8 @@ public record SellerProductController(ProductRepository repository) {
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/seller/products")
+    void findAllProducts() {
+    }
 }
