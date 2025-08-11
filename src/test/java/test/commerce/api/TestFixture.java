@@ -104,9 +104,13 @@ public record TestFixture(
     }
 
     public UUID registerProduct() {
+        return registerProduct(generateRegisterProductCommand());
+    }
+
+    public UUID registerProduct(RegisterProductCommand command) {
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/products",
-            generateRegisterProductCommand(),
+            command,
             Void.class
         );
         URI location = Objects.requireNonNull(response.getHeaders().getLocation());

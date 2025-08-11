@@ -4,6 +4,7 @@ import commerce.Product;
 import commerce.ProductRepository;
 import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static java.time.ZoneOffset.UTC;
 
 @RestController
 public record SellerProductController(ProductRepository repository) {
@@ -30,6 +34,12 @@ public record SellerProductController(ProductRepository repository) {
         var product = new Product();
         product.setId(id);
         product.setSellerId(UUID.fromString(user.getName()));
+        product.setName(command.name());
+        product.setImageUri(command.imgUri());
+        product.setDescription(command.description());
+        product.setPriceAmount(command.priceAmount());
+        product.setStockQuantity(command.stockQuantity());
+        product.setRegisteredTimeUtc(LocalDateTime.now(UTC));
         repository.save(product);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
@@ -45,7 +55,7 @@ public record SellerProductController(ProductRepository repository) {
     }
 
     @GetMapping("/seller/products/{id}")
-    ResponseEntity<?> findProduct(
+    ResponseEntity<SellerProductView> findProduct(
         @PathVariable("id") UUID id,
         Principal user
     ) {
@@ -53,6 +63,15 @@ public record SellerProductController(ProductRepository repository) {
 
         return repository.findById(id)
             .filter(product -> product.getSellerId().equals(sellerId))
+            .map(product -> new SellerProductView(
+                product.getId(),
+                product.getName(),
+                product.getImageUri(),
+                product.getDescription(),
+                product.getPriceAmount(),
+                product.getStockQuantity(),
+                product.getRegisteredTimeUtc()
+            ))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }

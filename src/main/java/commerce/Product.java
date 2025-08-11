@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -23,4 +25,11 @@ public class Product {
     private UUID id;
 
     private UUID sellerId;
+
+    private String name;
+    private String imageUri;
+    private String description;
+    private BigDecimal priceAmount;
+    private int stockQuantity;
+    private LocalDateTime registeredTimeUtc;
 }
