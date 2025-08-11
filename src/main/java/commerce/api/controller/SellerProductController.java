@@ -20,7 +20,8 @@ public record SellerProductController(ProductRepository repository) {
 
     @PostMapping("/seller/products")
     public ResponseEntity<?> registerProduct(
-        @RequestBody RegisterProductCommand command
+        @RequestBody RegisterProductCommand command,
+        Principal user
     ) {
         if(!isValidUrl(command.imgUri())) {
             return ResponseEntity.badRequest().build();
@@ -28,6 +29,7 @@ public record SellerProductController(ProductRepository repository) {
         UUID id = UUID.randomUUID();
         var product = new Product();
         product.setId(id);
+        product.setSellerId(UUID.fromString(user.getName()));
         repository.save(product);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
@@ -43,8 +45,14 @@ public record SellerProductController(ProductRepository repository) {
     }
 
     @GetMapping("/seller/products/{id}")
-    ResponseEntity<?> findProduct(@PathVariable("id") UUID id) {
+    ResponseEntity<?> findProduct(
+        @PathVariable("id") UUID id,
+        Principal user
+    ) {
+        UUID sellerId = UUID.fromString(user.getName());
+
         return repository.findById(id)
+            .filter(product -> product.getSellerId().equals(sellerId))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
