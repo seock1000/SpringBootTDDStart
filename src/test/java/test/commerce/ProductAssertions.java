@@ -3,6 +3,7 @@ package test.commerce;
 import commerce.command.RegisterProductCommand;
 import commerce.view.ProductView;
 import commerce.view.SellerProductView;
+import commerce.view.SellerView;
 import org.assertj.core.api.ThrowingConsumer;
 
 import java.math.BigDecimal;

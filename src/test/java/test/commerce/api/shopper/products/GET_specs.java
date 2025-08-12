@@ -3,6 +3,7 @@ package test.commerce.api.shopper.products;
 import commerce.command.RegisterProductCommand;
 import commerce.result.PageCarrier;
 import commerce.view.ProductView;
+import commerce.view.SellerMeView;
 import org.assertj.core.api.ThrowingConsumer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -138,5 +139,30 @@ public class GET_specs {
         // Assert
         ProductView actual = requireNonNull(response.getBody()).items()[0];
         assertThat(actual).satisfies(isViewDerivedFrom(command));
+    }
+
+    @Test
+    void 판매자_정보를_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.deleteAllProducts();
+        fixture.createSellerThenSetAsDefaultUser();
+        SellerMeView seller = fixture.getSeller();
+        fixture.registerProduct();
+
+        fixture.createShopperThenSetAsDefaultUser();
+
+        // Act
+        ResponseEntity<PageCarrier<ProductView>> response =
+            fixture.client().exchange(
+                get("/shopper/products").build(),
+                new ParameterizedTypeReference<>() { }
+            );
+
+        // Assert
+        ProductView actual = requireNonNull(response.getBody()).items()[0];
+        assertThat(actual.seller().id()).isEqualTo(seller.id());
+        assertThat(actual.seller().username()).isEqualTo(seller.username());
     }
 }

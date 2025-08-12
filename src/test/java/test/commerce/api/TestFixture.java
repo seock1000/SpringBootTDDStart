@@ -6,6 +6,7 @@ import commerce.command.RegisterProductCommand;
 import commerce.query.IssueSellerToken;
 import commerce.query.IssueShopperToken;
 import commerce.result.AccessTokenCarrier;
+import commerce.view.SellerMeView;
 import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.env.Environment;
@@ -136,5 +137,9 @@ public record TestFixture(
             ids.add(registerProduct());
         }
         return ids;
+    }
+
+    public SellerMeView getSeller() {
+        return client.getForObject("/seller/me", SellerMeView.class);
     }
 }
