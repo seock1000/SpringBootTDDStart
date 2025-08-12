@@ -16,11 +16,13 @@ import test.commerce.api.TestFixture;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,5 +145,26 @@ public class GET_specs {
         SellerProductView item = requireNonNull(body).items()[0];
         assertThat(item.registeredTimeUtc())
             .isCloseTo(expected, within(1, SECONDS));
+    }
+
+    @Test
+    void 상품_목록을_등록시점_역순으로_정렬한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        fixture.registerProducts();
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response =
+            fixture.client().exchange(
+                get("/seller/products").build(),
+                new ParameterizedTypeReference<>() {}
+            );
+
+        // Assert
+        assertThat(requireNonNull(response.getBody()).items())
+            .extracting(SellerProductView::registeredTimeUtc)
+            .isSortedAccordingTo(reverseOrder());
     }
 }

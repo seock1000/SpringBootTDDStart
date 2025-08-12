@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.UUID;
 
 import static java.time.ZoneOffset.UTC;
+import static java.util.Comparator.comparing;
 
 @RestController
 public record SellerProductController(ProductRepository repository) {
@@ -76,6 +78,7 @@ public record SellerProductController(ProductRepository repository) {
         SellerProductView[] items = repository
             .findBySellerId(UUID.fromString(user.getName()))
             .stream()
+            .sorted(comparing(Product::getRegisteredTimeUtc).reversed())
             .map(this::convertToView)
             .toArray(SellerProductView[]::new);
         return ResponseEntity.ok(new ArrayCarrier<>(items));
