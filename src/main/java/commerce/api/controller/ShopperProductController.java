@@ -51,13 +51,15 @@ public record ShopperProductController(
             .map(ProductSellerTuple::toView)
             .toArray(ProductView[]::new);
 
-        Long next = results.getLast().product().getDataKey();
+        Long next = results.size() <= pageSize
+            ? null
+            : results.getLast().product().getDataKey();
 
         return new PageCarrier<>(items, encodeCursor(next));
     }
 
     private Long decodeCursor(String continuationToken) {
-        if (continuationToken == null) {
+        if (continuationToken == null || continuationToken.isBlank()) {
             return null;
         }
         byte[] data = Base64.getUrlDecoder().decode(continuationToken);
@@ -65,6 +67,9 @@ public record ShopperProductController(
     }
 
     private String encodeCursor(Long cursor) {
+        if (cursor == null) {
+            return null;
+        }
         byte[] data = cursor.toString().getBytes(UTF_8);
         return Base64.getUrlEncoder().encodeToString(data);
     }
