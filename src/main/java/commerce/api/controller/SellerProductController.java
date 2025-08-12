@@ -4,6 +4,7 @@ import commerce.Product;
 import commerce.ProductRepository;
 import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
+import commerce.commandmodel.InvalidCommandException;
 import commerce.view.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public record SellerProductController(ProductRepository repository) {
         Principal user
     ) {
         if(!isValidUrl(command.imgUri())) {
-            return ResponseEntity.badRequest().build();
+            throw new InvalidCommandException();
         }
         UUID id = UUID.randomUUID();
         var product = new Product();
