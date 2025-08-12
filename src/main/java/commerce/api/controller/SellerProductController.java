@@ -91,7 +91,7 @@ public record SellerProductController(ProductRepository repository) {
                 product.getDescription(),
                 product.getPriceAmount(),
                 product.getStockQuantity(),
-                null
+                product.getRegisteredTimeUtc()
             ))
             .toArray(SellerProductView[]::new);
         return ResponseEntity.ok(new ArrayCarrier<>(items));

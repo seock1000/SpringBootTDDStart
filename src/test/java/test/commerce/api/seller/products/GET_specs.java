@@ -13,13 +13,18 @@ import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
 import test.commerce.api.TestFixture;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.springframework.http.RequestEntity.get;
 import static test.commerce.ProductAssertions.isDerivedFrom;
 import static test.commerce.RegisterProductCommandGenerator.generateRegisterProductCommand;
@@ -114,5 +119,29 @@ public class GET_specs {
         ArrayCarrier<SellerProductView> body = response.getBody();
         SellerProductView item = requireNonNull(body).items()[0];
         assertThat(item).satisfies(isDerivedFrom(command));
+    }
+
+    @Test
+    void 상품_등록_시간을_올바르게_반환한다(
+        @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        fixture.createSellerThenSetAsDefaultUser();
+        RegisterProductCommand command = generateRegisterProductCommand();
+        fixture.registerProduct(command);
+        LocalDateTime expected = LocalDateTime.now(UTC);
+
+        // Act
+        ResponseEntity<ArrayCarrier<SellerProductView>> response =
+            fixture.client().exchange(
+                get("/seller/products").build(),
+                new ParameterizedTypeReference<>() {}
+            );
+
+        // Assert
+        ArrayCarrier<SellerProductView> body = response.getBody();
+        SellerProductView item = requireNonNull(body).items()[0];
+        assertThat(item.registeredTimeUtc())
+            .isCloseTo(expected, within(1, SECONDS));
     }
 }
