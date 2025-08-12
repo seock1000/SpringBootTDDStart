@@ -384,3 +384,51 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 - [x] 상품 정보를 올바르게 반환한다
 - [x] 상품 등록 시간을 올바르게 반환한다
 - [x] 상품 목록을 등록시점 역순으로 정렬한다
+
+
+### 구매자 상품 탐색
+요청
+- 메서드: GET
+- 경로: /shopper/products
+- 쿼리 매개변수 
+  - continuationToken: string?
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+  ```
+- curl 명령 예시:
+  ```bash
+  curl -i -X GET 'http://localhost:8080/shopper/products?continuationToken={token}'
+  -H 'Authorization: Bearer {token}'
+  ```
+성공 응답:
+- 상태 코드: 200 OK
+- 본문:
+  ```
+  PageCarrier<ProductView> {
+    items: [ProductView {
+      id: String(UUID),
+      seller: SellerView {
+        id: String(UUID),
+        username: String
+      },
+      name: String,
+      imageUri: String,
+      description: String,
+      priceAmount: number,
+      stockQuantity: number
+    }],
+    continuationToken: string?
+  }
+  ```
+
+테스트
+- [x] 올바르게 요청하면 200 OK 응답을 반환한다
+- [x] 판매자 접근 토큰을 사용하면 403 FORBIDDEN 응답을 반환한다
+- [ ] 첫번째 페이지의 상품을 반환한다
+- [ ] 상품 목록을 등록시점 역순으로 정렬한다
+- [ ] 상품 속성을 올바르게 반환한다
+- [ ] 판매자 정보를 올바르게 반환한다
+- [ ] 두번째 페이지를 올바르게 반환한다
+- [ ] 마지막 페이지를 올바르게 반환한다
+- [ ] continuationToken에 빈 문자열이 지정되면 첫번째 페이지를 반환한다
