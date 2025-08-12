@@ -1,6 +1,7 @@
 package test.commerce;
 
 import commerce.command.RegisterProductCommand;
+import commerce.view.ProductView;
 import commerce.view.SellerProductView;
 import org.assertj.core.api.ThrowingConsumer;
 
@@ -19,6 +20,17 @@ public class ProductAssertions {
                 .matches(equals(command.priceAmount()));
             assertThat(product.imageUri()).isEqualTo(command.imgUri());
             assertThat(product.stockQuantity()).isEqualTo(command.stockQuantity());
+        };
+    }
+
+    public static ThrowingConsumer<? super ProductView> isViewDerivedFrom(RegisterProductCommand command) {
+        return view -> {
+            assertThat(view.id()).isNotNull();
+            assertThat(view.name()).isEqualTo(command.name());
+            assertThat(view.description()).isEqualTo(command.description());
+            assertThat(view.priceAmount())
+                .matches(equals(command.priceAmount()));
+            assertThat(view.imageUri()).isEqualTo(command.imgUri());
         };
     }
 
