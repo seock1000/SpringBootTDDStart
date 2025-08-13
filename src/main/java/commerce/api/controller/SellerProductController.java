@@ -2,9 +2,8 @@ package commerce.api.controller;
 
 import commerce.Product;
 import commerce.ProductRepository;
-import commerce.SellerRepository;
 import commerce.command.RegisterProductCommand;
-import commerce.commandmodel.InvalidCommandException;
+import commerce.commandmodel.RegisterProductCommandExecutor;
 import commerce.view.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-import static java.time.ZoneOffset.UTC;
 import static java.util.Comparator.comparing;
 
 @RestController
@@ -31,31 +28,11 @@ public record SellerProductController(ProductRepository repository) {
         @RequestBody RegisterProductCommand command,
         Principal user
     ) {
-        if(!isValidUrl(command.imgUri())) {
-            throw new InvalidCommandException();
-        }
         UUID id = UUID.randomUUID();
-        var product = new Product();
-        product.setId(id);
-        product.setSellerId(UUID.fromString(user.getName()));
-        product.setName(command.name());
-        product.setImageUri(command.imgUri());
-        product.setDescription(command.description());
-        product.setPriceAmount(command.priceAmount());
-        product.setStockQuantity(command.stockQuantity());
-        product.setRegisteredTimeUtc(LocalDateTime.now(UTC));
-        repository.save(product);
+        var executor = new RegisterProductCommandExecutor(repository::save);
+        executor.execute(id, UUID.fromString(user.getName()), command);
         URI location = URI.create("/seller/products/" + id);
         return ResponseEntity.created(location).build();
-    }
-
-    private boolean isValidUrl(String value) {
-        try {
-            URI uri = URI.create(value);
-            return uri.getHost() != null;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
     }
 
     @GetMapping("/seller/products/{id}")
