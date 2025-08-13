@@ -4,6 +4,11 @@ import commerce.Product;
 import commerce.ProductRepository;
 import commerce.command.RegisterProductCommand;
 import commerce.commandmodel.RegisterProductCommandExecutor;
+import commerce.query.FindSellerProduct;
+import commerce.query.GetSellerProducts;
+import commerce.querymodel.FindSellerProductQueryProcessor;
+import commerce.querymodel.GetSellerProductsQueryProcessor;
+import commerce.querymodel.ProductMapper;
 import commerce.view.ArrayCarrier;
 import commerce.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 
@@ -40,37 +48,17 @@ public record SellerProductController(ProductRepository repository) {
         @PathVariable("id") UUID id,
         Principal user
     ) {
-        UUID sellerId = UUID.fromString(user.getName());
-
-        return repository.findById(id)
-            .filter(product -> product.getSellerId().equals(sellerId))
-            .map(this::convertToView)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        var processor = new FindSellerProductQueryProcessor(repository::findById);
+        var query = new FindSellerProduct(id, UUID.fromString(user.getName()));
+        return ResponseEntity.of(processor.process(query));
     }
 
     @GetMapping("/seller/products")
-    ResponseEntity<ArrayCarrier<SellerProductView>> findAllProducts(
+    ArrayCarrier<SellerProductView> findAllProducts(
         Principal user
     ) {
-        SellerProductView[] items = repository
-            .findBySellerId(UUID.fromString(user.getName()))
-            .stream()
-            .sorted(comparing(Product::getRegisteredTimeUtc).reversed())
-            .map(this::convertToView)
-            .toArray(SellerProductView[]::new);
-        return ResponseEntity.ok(new ArrayCarrier<>(items));
-    }
-
-    private SellerProductView convertToView(Product product) {
-        return new SellerProductView(
-            product.getId(),
-            product.getName(),
-            product.getImageUri(),
-            product.getDescription(),
-            product.getPriceAmount(),
-            product.getStockQuantity(),
-            product.getRegisteredTimeUtc()
-        );
+        var processor = new GetSellerProductsQueryProcessor(repository::findBySellerId);
+        var query = new GetSellerProducts(UUID.fromString(user.getName()));
+        return processor.process(query);
     }
 }
