@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import test.commerce.api.CommerceApiTest;
+import test.commerce.api.TestFixture;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.RequestEntity.get;
 import static test.commerce.EmailGenerator.generateEmail;
@@ -30,7 +32,7 @@ public class GET_specs {
         String password = generatePassword();
         String username = generateUsername();
 
-        var command = new CreateSellerCommand(email, username, password);
+        var command = new CreateSellerCommand(email, username, password, generateEmail());
         client.postForEntity("/seller/signup", command, Void.class);
         AccessTokenCarrier carrier = client.postForObject(
             "/seller/issueToken",
@@ -74,7 +76,7 @@ public class GET_specs {
         String password1 = generatePassword();
         String username1 = generateUsername();
 
-        var command1 = new CreateSellerCommand(email1, username1, password1);
+        var command1 = new CreateSellerCommand(email1, username1, password1,generateEmail());
         client.postForEntity("/seller/signup", command1, Void.class);
         AccessTokenCarrier carrier1 = client.postForObject(
             "/seller/issueToken",
@@ -87,7 +89,7 @@ public class GET_specs {
         String password2 = generatePassword();
         String username2 = generateUsername();
 
-        var command2 = new CreateSellerCommand(email2, username2, password2);
+        var command2 = new CreateSellerCommand(email2, username2, password2, generateEmail());
         client.postForEntity("/seller/signup", command2, Void.class);
         AccessTokenCarrier carrier2 = client.postForObject(
             "/seller/issueToken",
@@ -124,7 +126,7 @@ public class GET_specs {
         String password = generatePassword();
         String username = generateUsername();
 
-        var command = new CreateSellerCommand(email, username, password);
+        var command = new CreateSellerCommand(email, username, password, generateEmail());
         client.postForEntity("/seller/signup", command, Void.class);
         AccessTokenCarrier carrier1 = client.postForObject(
             "/seller/issueToken",
@@ -167,7 +169,7 @@ public class GET_specs {
         String password = generatePassword();
         String username = generateUsername();
 
-        var command = new CreateSellerCommand(email, username, password);
+        var command = new CreateSellerCommand(email, username, password, generateEmail());
         client.postForEntity("/seller/signup", command, Void.class);
         AccessTokenCarrier carrier = client.postForObject(
             "/seller/issueToken",
@@ -188,5 +190,37 @@ public class GET_specs {
         SellerMeView actual = response.getBody();
         assertThat(actual.email()).isEqualTo(email);
         assertThat(actual.username()).isEqualTo(username);
+    }
+
+    @Test
+    void 문의_이메일_주소를_올바르게_설정한다(
+        @Autowired TestFixture fixture // TestFixture 역할
+        ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String username = generateUsername();
+        String contactEmail = generateEmail();
+
+        fixture.createSeller(email, username, password, contactEmail);
+
+        AccessTokenCarrier carrier = fixture.client().postForObject(
+            "/seller/issueToken",
+            new IssueSellerToken(email, password),
+            AccessTokenCarrier.class // 응답 본문
+        );
+        String token = carrier.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response = fixture.client().exchange(
+            get("/seller/me")
+                .header("Authorization", "Bearer " + token)
+                .build(),
+            SellerMeView.class
+        );
+
+        // Assert
+        SellerMeView actual = requireNonNull(response.getBody());
+        assertThat(actual.contactEmail()).isEqualTo(contactEmail);
     }
 }

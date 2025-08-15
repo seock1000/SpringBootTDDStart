@@ -32,7 +32,8 @@ public class POST_specs {
             new CreateSellerCommand(
                 email,
                 generateUsername(),
-                password
+                password,
+                generateEmail() // 이메일은 선택적 속성
             ),
             Void.class // 응답 본문
         );
@@ -60,7 +61,8 @@ public class POST_specs {
             new CreateSellerCommand(
                 email,
                 generateUsername(),
-                password
+                password,
+                generateEmail()
             ),
             Void.class // 응답 본문
         );
@@ -86,7 +88,7 @@ public class POST_specs {
         String password = generatePassword();
         client.postForEntity(
             "/seller/signup",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(email, generateUsername(), password, generateEmail()),
             Void.class // 응답 본문
         );
 
@@ -132,7 +134,7 @@ public class POST_specs {
 
         client.postForEntity(
             "/seller/signup",
-            new CreateSellerCommand(email, generateUsername(), password),
+            new CreateSellerCommand(email, generateUsername(), password, generateEmail()),
             Void.class // 응답 본문
         );
 

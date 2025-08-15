@@ -438,3 +438,51 @@ curl -i -X POST 'http://localhost:8080/seller/signup' \
 
 추가 테스트
 - [x] 비밀번호는 연속된 4개 이상의 문자를 포함해서는 안된다
+
+
+### 판매자 문의 이메일 요구사항 추가
+변경
+- 판매자 등록
+- 판매자 조회
+- 구매자 상품 조회
+
+테스트
+판매자 등록
+- [x] contactEmail 속성이 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다
+판매자 정보조회
+- [x] 문의 이메일 주소를 올바르게 설정한다
+구매자 상품 탐색
+- [x] 문의 이메일 주소를 올바르게 설정한다
+
+
+### 판매자 문의 이메일 주소 변경
+요청
+- 메서드: POST
+- 경로: /seller/changeContactEmail
+- 헤더:
+  ```
+    Authorization: Bearer {token}
+    Content-Type: application/json
+  ```
+- 본문:
+  ```
+  ChangeContactEmailCommand {
+    contactEmail: String
+  }
+  ```
+  - curl 명령 예시:
+    ```bash
+    curl -i -X POST 'http://localhost:8080/seller/changeContactEmail'
+    -H 'Authorization: Bearer {token}'
+    -H 'Content-Type: application/json' \
+    -d '{
+      "contactEmail": ""
+    }'
+    ```
+성공 응답:
+- 상태 코드: 204 NO_CONTENT
+
+테스트
+- [x] 올바르게 요청하면 204 NO_CONTENT 응답을 반환한다
+- [x] contactEmail 속성이 올바르게 지정되지 않으면 400 BAD_REQUEST 응답을 반환한다
+- [x] 문의 이메일 주소를 올바르게 변경한다

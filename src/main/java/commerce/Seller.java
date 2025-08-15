@@ -29,4 +29,7 @@ public class Seller {
 
     @Column(length = 1000)
     private String hashedPassword;
+
+    @Column(unique = true)
+    private String contactEmail;
 }

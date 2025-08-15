@@ -1,6 +1,7 @@
 package test.commerce.api;
 
 import commerce.ProductRepository;
+import commerce.command.CreateSellerCommand;
 import commerce.command.CreateShopperCommand;
 import commerce.command.RegisterProductCommand;
 import commerce.query.IssueSellerToken;
@@ -13,15 +14,12 @@ import org.springframework.boot.test.web.client.LocalHostUriTemplateHandler;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
@@ -83,12 +81,13 @@ public record TestFixture(
         String email = generateEmail();
         String username = generateUsername();
         String password = generatePassword();
-        createSeller(email, username, password);
+        String contactEmail = generateEmail();
+        createSeller(email, username, password, contactEmail);
         setSellerAsDefaultUser(email, password);
     }
 
-    private void createSeller(String email, String username, String password) {
-        var command = new CreateShopperCommand(email, username, password);
+    public void createSeller(String email, String username, String password, String contactEmail) {
+        var command = new CreateSellerCommand(email, username, password, contactEmail);
         client().postForEntity("/seller/signup", command, Void.class);
     }
 

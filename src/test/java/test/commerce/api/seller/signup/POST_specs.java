@@ -31,7 +31,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-        "password"
+        "password",
+            generateEmail()
         );
 
         // Act
@@ -53,7 +54,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             null, // email 속성 없음
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
 
         // Act
@@ -68,13 +70,7 @@ public class POST_specs {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "invalid-email",
-        "invalid-email@",
-        "invalid-email@test",
-        "invalid-email@test.",
-        "invalid-email@.com",
-    })
+    @MethodSource("test.commerce.TestDataSource#invalidEmails")
     void email_속성이_올바른_형식을_따르지_않으면_400_BAD_REQUEST_응답을_반환한다(
         String email,
         @Autowired TestRestTemplate client
@@ -83,7 +79,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             email, // 잘못된 형식의 email
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
 
         // Act
@@ -105,7 +102,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             null, // username 속성 없음
-            "password"
+            "password",
+            generateEmail()
         );
         // Act
         ResponseEntity<Void> response = client.postForEntity(
@@ -134,7 +132,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             username, // 잘못된 형식의 username
-            "password"
+            "password",
+            generateEmail()
         );
         // Act
         ResponseEntity<Void> response = client.postForEntity(
@@ -162,7 +161,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             username, // 올바른 형식의 username
-            "password"
+            "password",
+            generateEmail()
         );
         // Act
         ResponseEntity<Void> response = client.postForEntity(
@@ -182,7 +182,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            null // password 속성 없음
+            null, // password 속성 없음
+            generateEmail()
         );
         // Act
         ResponseEntity<Void> response = client.postForEntity(
@@ -204,7 +205,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            password // 잘못된 형식의 password
+            password, // 잘못된 형식의 password
+            generateEmail()
         );
         // Act
         ResponseEntity<Void> response = client.postForEntity(
@@ -225,14 +227,15 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             email,
             generateUsername(),
-            "password"
+            "password",
+            generateEmail()
         );
         client.postForEntity("/seller/signup", command, Void.class);
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/signup",
-            new CreateSellerCommand(email, generateUsername(), "password"), // 요청 본문
+            new CreateSellerCommand(email, generateUsername(), "password", generateEmail()), // 요청 본문
             Void.class // 응답 본문
         );
 
@@ -249,14 +252,15 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             username,
-            "password"
+            "password",
+            generateEmail()
         );
         client.postForEntity("/seller/signup", command, Void.class);
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
             "/seller/signup",
-            new CreateSellerCommand(generateEmail(), username, "password"), // 요청 본문
+            new CreateSellerCommand(generateEmail(), username, "password", generateEmail()), // 요청 본문
             Void.class // 응답 본문
         );
 
@@ -279,7 +283,8 @@ public class POST_specs {
         CreateSellerCommand command = new CreateSellerCommand(
             generateEmail(),
             generateUsername(),
-            generatePassword()
+            generatePassword(),
+            generateEmail()
         );
 
         // Act
@@ -298,5 +303,30 @@ public class POST_specs {
         String actual = seller.getHashedPassword();
         assertThat(actual).isNotNull();
         assertThat(encoder.matches(command.password(), actual)).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("test.commerce.TestDataSource#invalidEmails")
+    void contactEmail_속성이_올바른_형식을_따르지_않으면_400_BAD_REQUEST_응답을_반환한다(
+        String contactEmail,
+        @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        CreateSellerCommand command = new CreateSellerCommand(
+            generateEmail(),
+            generateUsername(),
+            "password",
+            contactEmail // 잘못된 형식의 contactEmail
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+            "/seller/signup",
+            command, // 요청 본문
+            Void.class // 응답 본문
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 }
